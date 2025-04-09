@@ -1,6 +1,6 @@
 import { Outfit } from 'next/font/google';
 import './globals.css';
-
+import "@radix-ui/themes/styles.css";
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 
