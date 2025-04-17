@@ -1,91 +1,69 @@
 'use client'
 
-'use client'
-
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { PencilIcon, Trash2Icon } from "lucide-react";
-import CustomDrawer from "@/components/drawer/customDrawer";
-import {Switch} from "@/components/ui/switch";
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import CustomPagination from "@/components/pagination/CustomPagination";
-
-interface Category {
-    id: string;
-    name: string;
-    slug: string;
-    description?: string;
-}
-
-const dummyCategories: Category[] = [
-    { id: "1", name: "Iqtisodiyot", slug: "iqtisodiyot", description: "Iqtisodiy fanlarga oid materiallar" },
-    { id: "2", name: "Ta'lim", slug: "talim", description: "Ta'lim sohasidagi dissertatsiyalar" },
-];
+import { Button } from '@/components/ui/button'
+import PageBreadcrumb from '@/components/common/PageBreadCrumb'
+import CustomPagination from '@/components/pagination/CustomPagination'
+import CollectionsTable from '@/components/pages/collections/collections-table'
+import React, { useState } from 'react'
+import { DialogModal } from '@/components/modal/custom.modal'
+import { CollectionForm } from '@/components/pages/collections/collections-form'
+import { CollectionFormValues } from '../../../../../../types/colecctions/collections.types'
+import {
+  useCollectionsQuery,
+  useCreateCollectionMutation,
+  useDeleteCollectionMutation,
+} from '@/hooks/use-collections'
 
 const Page = () => {
-    const [categories, setCategories] = useState<Category[]>(dummyCategories);
-    const [selected, setSelected] = useState<Category | null>(null);
-    const [open, setOpen] = useState(false);
+  const [pageNumber, setPageNumber] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(9)
+  const [openCreateModal, setOpenCreateModal] = useState<boolean>(false)
+  const [search, setSearch] = useState('')
 
-    const handleEdit = (category: Category) => {
-        setSelected(category);
-        setOpen(true);
-    };
+  //api calls
+  const { data: collections, refetch } = useCollectionsQuery(pageNumber, pageSize)
+  const CollectionsCreateMutation = useCreateCollectionMutation(refetch)
+  const CollectionDeleteMutation = useDeleteCollectionMutation(refetch)
 
-    const handleDelete = (id: string) => {
-        setCategories(categories.filter((cat) => cat.id !== id));
-    };
+  //api call functions
+  const addCollection = (values: CollectionFormValues) => {
+    CollectionsCreateMutation.mutate(values)
+    setOpenCreateModal(false)
+  }
 
-    return (
-        <div>
-                <PageBreadcrumb pageTitle="Barcha bo'limlar"/>
-            <div className="border-1 rounded-md px-2 py-2">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Nomi</TableHead>
-                            <TableHead>Slug</TableHead>
-                            <TableHead>Izoh</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {categories.map((cat) => (
-                            <TableRow key={cat.id}>
-                                <TableCell>{cat.name}</TableCell>
-                                <TableCell>{cat.slug}</TableCell>
-                                <TableCell>{cat.description}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline" onClick={() => handleEdit(cat)}>
-                                        <PencilIcon className="w-4 h-4" />
-                                    </Button>
-                                    <Button size="sm" variant="destructive" onClick={() => handleDelete(cat.id)}>
-                                        <Trash2Icon className="w-4 h-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-            <CustomDrawer
-                open={open}
-                setOpen={setOpen}
-                title="Bo'limni tahrirlash"
-                description={selected?.name + " bo'limini o'zgartiring."}
-            >
-                <Input value={selected?.name || ""} placeholder="Bo'lim nomi" readOnly />
-                <Input value={selected?.slug || ""} placeholder="Slug" readOnly />
-                <Input value={selected?.description || ""} placeholder="Izoh" readOnly />
-                <Switch/>
-            </CustomDrawer>
-                <div className="mt-4">
-                    <CustomPagination onPageChange={() => console.log('change')} position="end" totalPages={4} currentPage={1}/>
-                </div>
-        </div>
-    );
-};
+  const deleteCollection = (id: string) => {
+    console.log(id)
+    CollectionDeleteMutation.mutate(id)
+  }
 
-export default Page;
+  return (
+    <div>
+      <PageBreadcrumb pageTitle="Barcha bo'limlar" />
+      <div className="flex items-center justify-end">
+        <Button onClick={() => setOpenCreateModal(true)} className="mb-4">
+          Bo'lim qo'shish
+        </Button>
+      </div>
+      <div className="rounded-md border-1 px-2 py-2">
+        <CollectionsTable onDelete={deleteCollection} collections={collections?.data} />
+      </div>
+      <div className="mt-4">
+        <CustomPagination
+          onPageChange={setPageNumber}
+          totalPages={collections?.pageCount || 1}
+          currentPage={pageNumber}
+          position="right"
+        />
+      </div>
+      <DialogModal
+        title="Bo'lim qo'shish"
+        open={openCreateModal}
+        onClose={() => setOpenCreateModal(false)}
+      >
+        <CollectionForm onSubmitFunction={addCollection} />
+      </DialogModal>
+    </div>
+  )
+}
+
+export default Page
