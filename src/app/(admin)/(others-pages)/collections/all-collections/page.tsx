@@ -7,33 +7,50 @@ import CollectionsTable from '@/components/pages/collections/collections-table'
 import React, { useState } from 'react'
 import { DialogModal } from '@/components/modal/custom.modal'
 import { CollectionForm } from '@/components/pages/collections/collections-form'
-import { CollectionFormValues } from '../../../../../../types/colecctions/collections.types'
+import {
+  CollectionFormValues,
+  Collection,
+} from '../../../../../../types/colecctions/collections.types'
 import {
   useCollectionsQuery,
   useCreateCollectionMutation,
   useDeleteCollectionMutation,
+  useUpdateCollectionMutation,
 } from '@/hooks/use-collections'
+import { CollectionsDeleteDialog } from '@/components/pages/collections/collections-delete-dialog'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(9)
   const [openCreateModal, setOpenCreateModal] = useState<boolean>(false)
-  const [search, setSearch] = useState('')
+  const [openUpdateModal, setOpenUpdateModal] = useState<boolean>(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false)
+  const [deleteId, setDeleteId] = useState('')
+  const [editData, setEditData] = useState<Collection | null>(null)
 
-  //api calls
   const { data: collections, refetch } = useCollectionsQuery(pageNumber, pageSize)
   const CollectionsCreateMutation = useCreateCollectionMutation(refetch)
   const CollectionDeleteMutation = useDeleteCollectionMutation(refetch)
+  const CollectionUpdateMutation = useUpdateCollectionMutation(refetch)
 
-  //api call functions
   const addCollection = (values: CollectionFormValues) => {
     CollectionsCreateMutation.mutate(values)
     setOpenCreateModal(false)
   }
 
+  const updateCollection = (values: CollectionFormValues) => {
+    if (!editData) return
+    CollectionUpdateMutation.mutate({ payload: values, id: editData.id })
+    setOpenUpdateModal(false)
+  }
+
   const deleteCollection = (id: string) => {
-    console.log(id)
     CollectionDeleteMutation.mutate(id)
+  }
+
+  const openEditModal = (collection: Collection) => {
+    setEditData(collection)
+    setOpenUpdateModal(true)
   }
 
   return (
@@ -45,16 +62,20 @@ const Page = () => {
         </Button>
       </div>
       <div className="rounded-md border-1 px-2 py-2">
-        <CollectionsTable onDelete={deleteCollection} collections={collections?.data} />
-      </div>
-      <div className="mt-4">
-        <CustomPagination
-          onPageChange={setPageNumber}
-          totalPages={collections?.pageCount || 1}
-          currentPage={pageNumber}
-          position="right"
+        <CollectionsTable
+          onEdit={openEditModal}
+          setOpenDeleteModal={setOpenDeleteModal}
+          setDeleteId={setDeleteId}
+          collections={collections?.data}
         />
       </div>
+      <CustomPagination
+        onPageChange={setPageNumber}
+        totalPages={collections?.pageCount || 1}
+        currentPage={pageNumber}
+        position="right"
+      />
+
       <DialogModal
         title="Bo'lim qo'shish"
         open={openCreateModal}
@@ -62,6 +83,24 @@ const Page = () => {
       >
         <CollectionForm onSubmitFunction={addCollection} />
       </DialogModal>
+
+      {/* Update Modal */}
+      <DialogModal
+        title="Bo'limni tahrirlash"
+        open={openUpdateModal}
+        onClose={() => setOpenUpdateModal(false)}
+      >
+        <CollectionForm onSubmitFunction={updateCollection} initialData={editData ?? undefined} />
+      </DialogModal>
+
+      {/* Delete Dialog */}
+      {openDeleteModal && (
+        <CollectionsDeleteDialog
+          close={() => setOpenDeleteModal(false)}
+          onDelete={deleteCollection}
+          id={deleteId}
+        />
+      )}
     </div>
   )
 }

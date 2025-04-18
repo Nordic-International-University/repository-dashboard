@@ -6,6 +6,8 @@ import MonthlySalesChart from '@/components/ecommerce/MonthlySalesChart'
 import StatisticsChart from '@/components/ecommerce/StatisticsChart'
 import RecentOrders from '@/components/ecommerce/RecentOrders'
 import DemographicCard from '@/components/ecommerce/DemographicCard'
+import { PrivateRoute } from '@/components/auth/auth-provider'
+import { AuthProvider } from '@/components/auth/auth-context'
 
 export const metadata: Metadata = {
   title: 'Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template',

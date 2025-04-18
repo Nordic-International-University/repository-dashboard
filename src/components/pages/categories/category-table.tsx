@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import React, { JSX } from 'react'
 
 import { useState } from 'react'
 import { useQuery } from 'react-query'
@@ -28,11 +28,12 @@ import CustomPagination from '@/components/pagination/CustomPagination'
 interface CategoryTableProps {
   onEdit: (category: Category) => void
   onDelete: (category: Category) => void
+  AddCategoryButton: any
 }
 
-export function CategoryTable({ onEdit, onDelete }: CategoryTableProps) {
+export function CategoryTable({ onEdit, onDelete, AddCategoryButton }: CategoryTableProps) {
   const [pageNumber, setPageNumber] = useState<number>(1)
-  const [pageSize, setPageSize] = useState<number>(6)
+  const [pageSize, setPageSize] = useState<number>(9)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState<string>('')
 
@@ -106,6 +107,7 @@ export function CategoryTable({ onEdit, onDelete }: CategoryTableProps) {
           onChange={handleSearchChange}
           className="max-w-sm"
         />
+        <AddCategoryButton />
       </div>
 
       <div className="rounded-md border">
@@ -156,14 +158,12 @@ export function CategoryTable({ onEdit, onDelete }: CategoryTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="w-full">
-        <CustomPagination
-          onPageChange={setPageNumber}
-          totalPages={data?.pageCount || 1}
-          currentPage={pageNumber}
-          position="right"
-        />
-      </div>
+      <CustomPagination
+        onPageChange={setPageNumber}
+        totalPages={data?.pageCount || 1}
+        currentPage={pageNumber}
+        position="right"
+      />
     </div>
   )
 }

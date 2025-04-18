@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { axiosInstance } from '@/services/base.axios'
 
 interface FileUploadProps {
   label?: string
@@ -33,18 +34,17 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     setUploading(true)
     try {
-      const res = await fetch('/file/upload', {
+      const res = await axiosInstance.post('/documents/upload', {
         method: 'POST',
         body: formData,
       })
 
-      if (!res.ok) throw new Error('Fayl yuklashda xatolik yuz berdi')
+      if (!res) throw new Error('Fayl yuklashda xatolik yuz berdi')
 
-      const data = await res.json()
-
-      if (data.url) {
+      console.log(res)
+      if (res.data.url) {
         setFileName(file.name)
-        onChange(data.url)
+        onChange(res.data.url)
         toast('✅ Fayl yuklandi!', {
           description: file.name,
         })

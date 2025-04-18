@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,7 @@ import { Category } from '../../../../../../types/category/category.types'
 import { CategoryTable } from '@/components/pages/categories/category-table'
 import { CategoryDialog } from '@/components/pages/categories/categories-dialog'
 import { DeleteCategoryDialog } from '@/components/pages/categories/delete-category-dialog'
+import PageBreadcrumb from '@/components/common/PageBreadCrumb'
 
 export default function Page() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
@@ -26,16 +27,22 @@ export default function Page() {
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Categories</h1>
-        <Button onClick={() => setCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Category
-        </Button>
-      </div>
-
-      <CategoryTable onEdit={handleEdit} onDelete={handleDelete} />
+    <div>
+      <PageBreadcrumb pageTitle="Barcha yo'nalishlar" />
+      <CategoryTable
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        AddCategoryButton={() => {
+          return (
+            <div className="flex items-center justify-between">
+              <Button onClick={() => setCreateDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Category
+              </Button>
+            </div>
+          )
+        }}
+      />
 
       <CategoryDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} mode="create" />
 

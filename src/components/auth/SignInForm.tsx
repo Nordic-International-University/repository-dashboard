@@ -19,16 +19,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { formSchema } from '@/schemes/auth.scheme'
 import { useMutation } from 'react-query'
 import { authLogin } from '@/services/auth.service'
-import { getStatusMessage } from '@/lib/error.handler'
 import { toast } from '@/components/toast/toast'
 import { useRouter } from 'next/navigation'
 import Cookie from 'js-cookie'
 import { AuthResponse } from '../../../types/auth/auth.types'
+import { useAuth } from '@/components/auth/auth-context'
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
-
+  const { setAuthenticated } = useAuth()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,12 +39,14 @@ export default function SignInForm() {
 
   const AuthMutation = useMutation(authLogin, {
     onSuccess: (data: AuthResponse) => {
+      Cookie.set('access_token', data.accessToken)
+      setAuthenticated(true)
       toast('Muvaffaqiyatli kirildi!', '', () => console.log('success'))
       router.push('/')
-      Cookie.set('accessToken', data.accessToken)
     },
-    onError: (error: any) => {
-      toast(getStatusMessage(error.status), '', () => console.log(error.message))
+    onError: (error: Error) => {
+      console.log(error)
+      toast('parol yoki login xato!', '', () => console.log('success'))
     },
   })
 

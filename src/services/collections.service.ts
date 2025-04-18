@@ -9,7 +9,7 @@ import { axiosInstance } from '@/services/base.axios'
 export const collectionsService = {
   async getCollections(params: CollectionsQueryParams): Promise<PaginatedResponse<Collection>> {
     try {
-      const { data } = await axiosInstance.get('/collections', { params })
+      const { data } = await axiosInstance.get('/collection', { params })
       return data
     } catch (error) {
       console.error('Failed to fetch collections:', error)
@@ -19,7 +19,7 @@ export const collectionsService = {
 
   async getCollection(id: string): Promise<Collection> {
     try {
-      const { data } = await axiosInstance.get(`/collections/${id}`)
+      const { data } = await axiosInstance.get(`/collection/${id}`)
       return data
     } catch (error) {
       console.error(`Failed to fetch collection with id ${id}:`, error)
@@ -29,7 +29,7 @@ export const collectionsService = {
 
   async createCollection(payload: CollectionFormValues): Promise<Collection> {
     try {
-      const { data } = await axiosInstance.post('/collections', payload)
+      const { data } = await axiosInstance.post('/collection', payload)
       return data
     } catch (error) {
       console.error('Failed to create collection:', error)
@@ -39,7 +39,7 @@ export const collectionsService = {
 
   async updateCollection(id: string, payload: Partial<CollectionFormValues>): Promise<Collection> {
     try {
-      const { data } = await axiosInstance.patch(`/collections/${id}`, payload)
+      const { data } = await axiosInstance.patch(`/collection/${id}`, payload)
       return data
     } catch (error) {
       console.error(`Failed to update collection with id ${id}:`, error)
@@ -49,7 +49,7 @@ export const collectionsService = {
 
   async deleteCollection(id: string): Promise<{ message: string }> {
     try {
-      const { data } = await axiosInstance.delete(`/collections/${id}`)
+      const { data } = await axiosInstance.delete(`/collection/${id}`)
       return data
     } catch (error) {
       console.error(`Failed to delete collection with id ${id}:`, error)

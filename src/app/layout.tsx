@@ -5,7 +5,7 @@ import { SidebarProvider } from '@/context/SidebarContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import QueryProvider from '@/lib/query.provider'
 import { Toaster } from '@/components/ui/sonner'
-import { ReduxProvider } from '@/store/provider'
+import { AuthProvider } from '@/components/auth/auth-context'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -22,7 +22,9 @@ export default function RootLayout({
         <QueryProvider>
           {/*<ReduxProvider>*/}
           <ThemeProvider>
-            <SidebarProvider>{children}</SidebarProvider>
+            <AuthProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </AuthProvider>
           </ThemeProvider>
           {/*</ReduxProvider>*/}
         </QueryProvider>

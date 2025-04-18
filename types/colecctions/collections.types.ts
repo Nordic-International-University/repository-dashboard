@@ -29,4 +29,11 @@ export interface CollectionsQueryParams {
 
 export interface CollectionFormProps {
   onSubmitFunction: (data: CollectionFormValues) => void
+  initialData?: Collection
+}
+
+export interface CollectionsDeleteDialogType {
+  close: () => void
+  onDelete: (id: string) => void
+  id: string
 }

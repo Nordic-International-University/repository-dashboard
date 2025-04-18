@@ -15,9 +15,11 @@ import {
   PlugInIcon,
   UserCircleIcon,
 } from '../icons/index'
-import { BiPaperclip } from 'react-icons/bi'
 import { FiBarChart } from 'react-icons/fi'
 import { CiSettings } from 'react-icons/ci'
+import { GrResources } from 'react-icons/gr'
+import { FaBook } from 'react-icons/fa'
+import { VscSymbolKeyword } from 'react-icons/vsc'
 
 type NavItem = {
   name: string
@@ -41,6 +43,21 @@ const navItems: NavItem[] = [
     icon: <FolderIcon />,
     name: "Yo'nalishlar",
     subItems: [{ name: "Barcha Yo'nalishlar", path: '/categories/all-categories', pro: false }],
+  },
+  {
+    icon: <GrResources size={20} />,
+    name: 'Material Resurs turi',
+    subItems: [{ name: 'Barcha resurslar', path: '/resource-type/all-resource-type', pro: false }],
+  },
+  {
+    icon: <FaBook size={18} />,
+    name: 'fanlar',
+    subItems: [{ name: 'Barcha fanlar', path: '/subjects/all-subject', pro: false }],
+  },
+  {
+    icon: <VscSymbolKeyword size={18} />,
+    name: `Kalit so'zlar`,
+    subItems: [{ name: `Barcha kalit so'zlar`, path: '/keywords/all-keyword', pro: false }],
   },
   {
     icon: <FileIcon />,

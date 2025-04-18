@@ -35,7 +35,7 @@ export const DialogModal: React.FC<DialogModalProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className={cn(width, className)}>
+      <DialogContent forceMount={true} className={cn(width, className)}>
         {!hideHeader && (title || description) && (
           <DialogHeader>
             {title && <DialogTitle>{title}</DialogTitle>}

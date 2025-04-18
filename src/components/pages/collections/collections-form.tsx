@@ -16,10 +16,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { collectionsCreateFormScheme } from '@/schemes/collections.scheme'
 import { CollectionFormProps } from '../../../../types/colecctions/collections.types'
+import { useEffect } from 'react'
+import FileUpload from '@/components/file.upload'
 
 type CollectionFormValues = z.infer<typeof collectionsCreateFormScheme>
 
-export const CollectionForm = ({ onSubmitFunction }: CollectionFormProps) => {
+export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionFormProps) => {
   const form = useForm<CollectionFormValues>({
     resolver: zodResolver(collectionsCreateFormScheme),
     defaultValues: {
@@ -28,6 +30,16 @@ export const CollectionForm = ({ onSubmitFunction }: CollectionFormProps) => {
       coverImage: '',
     },
   })
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        title: initialData.title,
+        description: initialData.description,
+        coverImage: initialData.coverImage,
+      })
+    }
+  }, [])
 
   const onSubmit = (values: CollectionFormValues) => {
     onSubmitFunction(values)
@@ -72,15 +84,16 @@ export const CollectionForm = ({ onSubmitFunction }: CollectionFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} placeholder="rasm uchun" />
-                {/*<FileUpload onChange={(url) => form.setValue('coverImage', url)} accept="image/*" />*/}
+                <FileUpload onChange={(url) => form.setValue('coverImage', url)} accept="image/*" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">Kolleksiyani yaratish</Button>
+        <div className="itmes-center flex justify-end">
+          <Button type="submit">Bolim yaratish</Button>
+        </div>
       </form>
     </Form>
   )

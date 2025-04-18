@@ -35,3 +35,17 @@ export const useDeleteCollectionMutation = (refetchCallback: () => void) => {
     },
   })
 }
+
+export const useUpdateCollectionMutation = (refetchCallback: () => void) => {
+  return useMutation({
+    mutationFn: ({ payload, id }: { payload: CollectionFormValues; id: string }) =>
+      collectionsService.updateCollection(id, payload),
+    onSuccess: () => {
+      toast.success(`Bo'lim muvaffaqiyatli Tahrirlandi!`)
+      refetchCallback()
+    },
+    onError: () => {
+      toast.error(`Bo'lim yaratishda xatolik yuz berdi!`)
+    },
+  })
+}

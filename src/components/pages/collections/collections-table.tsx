@@ -9,22 +9,27 @@ import {
 } from '@/components/ui/table'
 import type { Collection } from '@/../types/colecctions/collections.types'
 import dayjs from 'dayjs'
-import { BiDotsVerticalRounded } from 'react-icons/bi'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface CollectionsTableProps {
   collections?: Collection[]
-  onEdit?: (collection: Collection) => void
-  onDelete?: (id: string) => void
+  onEdit?: (collection: Collection, id: string) => void
+  setDeleteId: (id: string) => void
+  setOpenDeleteModal: (open: boolean) => void
 }
 
-const CollectionsTable = ({ collections, onEdit, onDelete }: CollectionsTableProps) => {
+const CollectionsTable = ({
+  collections,
+  onEdit,
+  setDeleteId,
+  setOpenDeleteModal,
+}: CollectionsTableProps) => {
+  const deleteCollection = (id: string) => {
+    setDeleteId(id)
+    setOpenDeleteModal(true)
+  }
+
   return (
     <div className="overflow-hidden rounded-xl shadow-sm">
       <Table>
@@ -48,24 +53,18 @@ const CollectionsTable = ({ collections, onEdit, onDelete }: CollectionsTablePro
                 <TableCell>{dayjs(item.createdAt).format('DD-MM-YYYY')}</TableCell>
                 <TableCell>{dayjs(item.updatedAt).format('DD-MM-YYYY')}</TableCell>
                 <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="hover:bg-muted rounded-md p-1 transition">
-                        <BiDotsVerticalRounded size={18} />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem className="text-green-600" onClick={() => onEdit?.(item)}>
-                        <Pencil className="text-green-600" /> Tahrirlash
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onDelete?.(item.id)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="text-red-600" /> O'chirish
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit && onEdit(item, item.id)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => deleteCollection(item.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))

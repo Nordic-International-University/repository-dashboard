@@ -43,13 +43,16 @@ export const categoryService = {
     }
   },
 
-  async updateCategory(categoryId: string, category: Category): Promise<Category> {
+  async updateCategory(
+    categoryId: string,
+    category: undefined | CategoryResponse
+  ): Promise<Category> {
     console.log(categoryId)
     try {
       const response = await axiosInstance.patch<Category>(`/category/${categoryId}`, category)
       return response.data
     } catch (error) {
-      console.error(`Error updating category with ID ${category.id}:`, error)
+      console.error(`Error updating category with ID ${categoryId}:`, error)
       throw error
     }
   },
