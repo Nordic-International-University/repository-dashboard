@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useSidebar } from '../context/SidebarContext'
+import { useSidebar } from '@/context/SidebarContext'
 import {
   BoxCubeIcon,
   ChevronDownIcon,
@@ -20,15 +20,25 @@ import { CiSettings } from 'react-icons/ci'
 import { GrResources } from 'react-icons/gr'
 import { FaBook } from 'react-icons/fa'
 import { VscSymbolKeyword } from 'react-icons/vsc'
+import { useQuery } from 'react-query'
+import { authService } from '@/services/auth.service'
+import { AuthUser } from '../../types/auth/auth.types'
 
 type NavItem = {
   name: string
   icon: React.ReactNode
   path?: string
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[]
+  permissionModule?: string
+  subItems?: {
+    permissionModule: string
+    name: string
+    path: string
+    pro?: boolean
+    new?: boolean
+  }[]
 }
 
-const navItems: NavItem[] = [
+export const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: 'Bosh sahifa',
@@ -37,64 +47,191 @@ const navItems: NavItem[] = [
   {
     icon: <FolderIcon />,
     name: "Bo'limlar",
-    subItems: [{ name: "Barcha bo'limlar", path: '/collections/all-collections', pro: false }],
+    permissionModule: 'collections',
+    subItems: [
+      {
+        name: "Barcha bo'limlar",
+        path: '/collections/all-collections',
+        pro: false,
+        permissionModule: 'collections',
+      },
+    ],
   },
   {
     icon: <FolderIcon />,
     name: "Yo'nalishlar",
-    subItems: [{ name: "Barcha Yo'nalishlar", path: '/categories/all-categories', pro: false }],
+    permissionModule: 'categories',
+    subItems: [
+      {
+        name: "Barcha Yo'nalishlar",
+        path: '/categories/all-categories',
+        pro: false,
+        permissionModule: 'categories',
+      },
+    ],
   },
   {
     icon: <GrResources size={20} />,
     name: 'Material Resurs turi',
-    subItems: [{ name: 'Barcha resurslar', path: '/resource-type/all-resource-type', pro: false }],
+    permissionModule: 'resource-type',
+    subItems: [
+      {
+        name: 'Barcha resurslar',
+        path: '/resource-type/all-resource-type',
+        pro: false,
+        permissionModule: 'resource-type',
+      },
+    ],
   },
   {
     icon: <FaBook size={18} />,
     name: 'fanlar',
-    subItems: [{ name: 'Barcha fanlar', path: '/subjects/all-subject', pro: false }],
+    permissionModule: 'subjects',
+    subItems: [
+      {
+        name: 'Barcha fanlar',
+        path: '/subjects/all-subject',
+        pro: false,
+        permissionModule: 'subjects',
+      },
+    ],
   },
   {
     icon: <VscSymbolKeyword size={18} />,
     name: `Kalit so'zlar`,
-    subItems: [{ name: `Barcha kalit so'zlar`, path: '/keywords/all-keyword', pro: false }],
+    permissionModule: 'keywords',
+    subItems: [
+      {
+        name: `Barcha kalit so'zlar`,
+        path: '/keywords/all-keyword',
+        pro: false,
+        permissionModule: 'keywords',
+      },
+    ],
   },
   {
     icon: <FileIcon />,
     name: 'Materiallar',
+    permissionModule: 'materials',
     subItems: [
-      { name: 'Barcha materiallar', path: '/admin/items', pro: false },
-      { name: 'Yangi material qo‘shish', path: '/admin/items/new', pro: false },
-      { name: 'Tasdiqlanishi kerak', path: '/admin/items/pending', pro: false },
-      { name: 'Arxivdagilar', path: '/admin/items/archived', pro: false },
+      {
+        name: 'Barcha materiallar',
+        path: '/materials/all-materials',
+        pro: false,
+        permissionModule: 'materials',
+      },
+      {
+        name: 'Yangi material qo‘shish',
+        path: '/admin/items/new',
+        pro: false,
+        permissionModule: 'materials',
+      },
+      {
+        name: 'Tasdiqlanishi kerak',
+        path: '/admin/items/pending',
+        pro: false,
+        permissionModule: 'materials',
+      },
+      {
+        name: 'Arxivdagilar',
+        path: '/admin/items/archived',
+        pro: false,
+        permissionModule: 'materials',
+      },
+    ],
+  },
+  {
+    icon: <FileIcon />,
+    name: 'Yuklangan hujjatlar',
+    permissionModule: 'document',
+    subItems: [
+      {
+        name: 'Barcha hujjatlar',
+        path: '/document/all-documents',
+        pro: false,
+        permissionModule: 'document',
+      },
     ],
   },
   {
     icon: <UserCircleIcon />,
     name: 'Foydalanuvchilar',
+    permissionModule: 'subjects',
     subItems: [
-      { name: 'Foydalanuvchilar', path: '/admin/users', pro: false },
-      { name: 'Yangi foydalanuvchi', path: '/admin/users/new', pro: false },
-      { name: 'Admin huquqlari', path: '/admin', pro: false },
+      {
+        name: 'Foydalanuvchilar',
+        path: '/admin/users',
+        pro: false,
+        permissionModule: 'user',
+      },
+      {
+        name: 'Yangi foydalanuvchi',
+        path: '/admin/users/new',
+        pro: false,
+        permissionModule: 'user',
+      },
+      {
+        name: 'Admin huquqlari',
+        path: '/admin',
+        pro: false,
+        permissionModule: 'user',
+      },
     ],
   },
   {
     icon: <FiBarChart size={25} />,
     name: 'Statistika',
+    permissionModule: 'statistics',
     subItems: [
-      { name: 'Umumiy ko‘rsatkichlar', path: '/admin/statistics', pro: false },
-      { name: 'Yuklab olishlar', path: '/admin/statistics/downloads', pro: false },
-      { name: 'Ko‘rishlar', path: '/admin/statistics/views', pro: false },
+      {
+        name: 'Umumiy ko‘rsatkichlar',
+        path: '/admin/statistics',
+        pro: false,
+        permissionModule: 'statistics',
+      },
+      {
+        name: 'Yuklab olishlar',
+        path: '/admin/statistics/downloads',
+        pro: false,
+        permissionModule: 'statistics',
+      },
+      {
+        name: 'Ko‘rishlar',
+        path: '/admin/statistics/views',
+        pro: false,
+        permissionModule: 'statistics',
+      },
     ],
   },
   {
     icon: <CiSettings size={25} />,
     name: 'Sozlamalar',
+    permissionModule: 'settings',
     subItems: [
-      { name: 'Sayt sozlamalari', path: '/admin/settings/site', pro: false },
-      { name: 'Metadata maydonlari', path: '/admin/settings/metadata', pro: false },
-      { name: 'Litsenziyalar', path: '/admin/settings/licenses', pro: false },
-      { name: 'API va xavfsizlik', path: '/admin/settings/api', pro: false },
+      {
+        name: 'Sayt sozlamalari',
+        path: '/admin/settings/site',
+        pro: false,
+        permissionModule: 'settings',
+      },
+      {
+        name: 'Metadata maydonlari',
+        path: '/admin/settings/metadata',
+        pro: false,
+        permissionModule: 'settings',
+      },
+      {
+        name: 'Litsenziyalar',
+        path: '/admin/settings/licenses',
+        pro: false,
+        permissionModule: 'settings',
+      },
+      {
+        name: 'API va xavfsizlik',
+        path: '/admin/settings/api',
+        pro: false,
+        permissionModule: 'settings',
+      },
     ],
   },
 ]
@@ -103,154 +240,59 @@ const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: 'Diagrammalar',
+    permissionModule: '',
     subItems: [
-      { name: 'Chiziqli diagramma', path: '/line-chart', pro: false },
-      { name: 'Ustunli diagramma', path: '/bar-chart', pro: false },
+      { permissionModule: '', name: 'Chiziqli diagramma', path: '/line-chart', pro: false },
+      { permissionModule: '', name: 'Ustunli diagramma', path: '/bar-chart', pro: false },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: 'UI elementlar',
+    permissionModule: '',
     subItems: [
-      { name: 'Ogohlantirishlar', path: '/alerts', pro: false },
-      { name: 'Avatarlar', path: '/avatars', pro: false },
-      { name: 'Nishonchalar', path: '/badge', pro: false },
-      { name: 'Tugmalar', path: '/buttons', pro: false },
-      { name: 'Rasmlar', path: '/images', pro: false },
-      { name: 'Videolar', path: '/videos', pro: false },
+      { permissionModule: '', name: 'Ogohlantirishlar', path: '/alerts', pro: false },
+      { permissionModule: '', name: 'Avatarlar', path: '/avatars', pro: false },
+      { permissionModule: '', name: 'Nishonchalar', path: '/badge', pro: false },
+      { permissionModule: '', name: 'Tugmalar', path: '/buttons', pro: false },
+      { permissionModule: '', name: 'Rasmlar', path: '/images', pro: false },
+      { permissionModule: '', name: 'Videolar', path: '/videos', pro: false },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: 'Avtorizatsiya',
+    permissionModule: '',
     subItems: [
-      { name: 'Kirish', path: '/signin', pro: false },
-      { name: 'Ro‘yxatdan o‘tish', path: '/signup', pro: false },
+      { permissionModule: '', name: 'Kirish', path: '/signin', pro: false },
+      { permissionModule: '', name: 'Ro‘yxatdan o‘tish', path: '/signup', pro: false },
     ],
+  },
+  {
+    icon: <FileIcon />,
+    name: 'Biz haqimizda',
+    path: '/about',
   },
 ]
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
   const pathname = usePathname()
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useQuery<AuthUser>({
+    queryKey: ['getPermissions'],
+    queryFn: () => authService.getProfile(),
+    staleTime: 1000 * 60 * 5,
+  })
 
-  const renderMenuItems = (navItems: NavItem[], menuType: 'main' | 'others') => (
-    <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
-        <li key={nav.name}>
-          {nav.subItems ? (
-            <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? 'menu-item-active'
-                  : 'menu-item-inactive'
-              } cursor-pointer ${
-                !isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
-              }`}
-            >
-              <span
-                className={` ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? 'menu-item-icon-active'
-                    : 'menu-item-icon-inactive'
-                }`}
-              >
-                {nav.icon}
-              </span>
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto h-5 w-5 transition-transform duration-200 ${
-                    openSubmenu?.type === menuType && openSubmenu?.index === index
-                      ? 'text-brand-500 rotate-180'
-                      : ''
-                  }`}
-                />
-              )}
-            </button>
-          ) : (
-            nav.path && (
-              <Link
-                href={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
-                }`}
-              >
-                <span
-                  className={`${
-                    isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'
-                  }`}
-                >
-                  {nav.icon}
-                </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
-                )}
-              </Link>
-            )
-          )}
-          {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
-            <div
-              ref={(el) => {
-                subMenuRefs.current[`${menuType}-${index}`] = el
-              }}
-              className="overflow-hidden transition-all duration-300"
-              style={{
-                height:
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? `${subMenuHeight[`${menuType}-${index}`]}px`
-                    : '0px',
-              }}
-            >
-              <ul className="mt-2 ml-9 space-y-1">
-                {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
-                    <Link
-                      href={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? 'menu-dropdown-item-active'
-                          : 'menu-dropdown-item-inactive'
-                      }`}
-                    >
-                      {subItem.name}
-                      <span className="ml-auto flex items-center gap-1">
-                        {subItem.new && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? 'menu-dropdown-badge-active'
-                                : 'menu-dropdown-badge-inactive'
-                            } menu-dropdown-badge`}
-                          >
-                            new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? 'menu-dropdown-badge-active'
-                                : 'menu-dropdown-badge-inactive'
-                            } menu-dropdown-badge`}
-                          >
-                            new
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </li>
-      ))}
-    </ul>
-  )
+  const hasPermission = (module?: string): boolean | undefined => {
+    if (!module) return true
+    if (user?.permissions?.some((perm) => perm.module === 'admin')) return true
+    return user?.permissions?.some((perm) => perm.module === module)
+  }
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: 'main' | 'others'
@@ -304,6 +346,136 @@ const AppSidebar: React.FC = () => {
       return { type: menuType, index }
     })
   }
+
+  if (isLoading || !user) {
+    return null
+  }
+  const renderMenuItems = (navItems: NavItem[], menuType: 'main' | 'others') => (
+    <ul className="flex flex-col gap-4">
+      {navItems
+        .filter(
+          (nav) =>
+            hasPermission(nav.permissionModule) ||
+            nav.subItems?.some((sub) => hasPermission(sub.permissionModule))
+        )
+        .map((nav, index) => (
+          <li key={nav.name}>
+            {nav.subItems ? (
+              <button
+                onClick={() => handleSubmenuToggle(index, menuType)}
+                className={`menu-item group ${
+                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                    ? 'menu-item-active'
+                    : 'menu-item-inactive'
+                } cursor-pointer ${
+                  !isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
+                }`}
+              >
+                <span
+                  className={` ${
+                    openSubmenu?.type === menuType && openSubmenu?.index === index
+                      ? 'menu-item-icon-active'
+                      : 'menu-item-icon-inactive'
+                  }`}
+                >
+                  {nav.icon}
+                </span>
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <span className={`menu-item-text`}>{nav.name}</span>
+                )}
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <ChevronDownIcon
+                    className={`ml-auto h-5 w-5 transition-transform duration-200 ${
+                      openSubmenu?.type === menuType && openSubmenu?.index === index
+                        ? 'text-brand-500 rotate-180'
+                        : ''
+                    }`}
+                  />
+                )}
+              </button>
+            ) : (
+              nav.path &&
+              hasPermission(nav.permissionModule) && (
+                <Link
+                  href={nav.path}
+                  className={`menu-item group ${
+                    isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
+                  }`}
+                >
+                  <span
+                    className={`${
+                      isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'
+                    }`}
+                  >
+                    {nav.icon}
+                  </span>
+                  {(isExpanded || isHovered || isMobileOpen) && (
+                    <span className={`menu-item-text`}>{nav.name}</span>
+                  )}
+                </Link>
+              )
+            )}
+            {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
+              <div
+                ref={(el) => {
+                  subMenuRefs.current[`${menuType}-${index}`] = el
+                }}
+                className="overflow-hidden transition-all duration-300"
+                style={{
+                  height:
+                    openSubmenu?.type === menuType && openSubmenu?.index === index
+                      ? `${subMenuHeight[`${menuType}-${index}`]}px`
+                      : '0px',
+                }}
+              >
+                <ul className="mt-2 ml-9 space-y-1">
+                  {nav.subItems
+                    .filter((sub) => hasPermission(sub.permissionModule))
+                    .map((subItem) => (
+                      <li key={subItem.name}>
+                        <Link
+                          href={subItem.path}
+                          className={`menu-dropdown-item ${
+                            isActive(subItem.path)
+                              ? 'menu-dropdown-item-active'
+                              : 'menu-dropdown-item-inactive'
+                          }`}
+                        >
+                          {subItem.name}
+                          <span className="ml-auto flex items-center gap-1">
+                            {subItem.new && (
+                              <span
+                                className={`ml-auto ${
+                                  isActive(subItem.path)
+                                    ? 'menu-dropdown-badge-active'
+                                    : 'menu-dropdown-badge-inactive'
+                                } menu-dropdown-badge`}
+                              >
+                                new
+                              </span>
+                            )}
+                            {subItem.pro && (
+                              <span
+                                className={`ml-auto ${
+                                  isActive(subItem.path)
+                                    ? 'menu-dropdown-badge-active'
+                                    : 'menu-dropdown-badge-inactive'
+                                } menu-dropdown-badge`}
+                              >
+                                pro
+                              </span>
+                            )}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+          </li>
+        ))}
+    </ul>
+  )
 
   return (
     <aside

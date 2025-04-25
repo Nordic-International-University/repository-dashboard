@@ -18,10 +18,11 @@ import {
 import ResourceTypeTable from '@/components/pages/resources/resources-table'
 import { ResourceTypeForm } from '@/components/pages/resources/resources-form'
 import { ResourceTypeDeleteDialog } from '@/components/pages/resources/resources-delete-dialog'
+import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState(1)
-  const [pageSize] = useState(9)
+  const pageSize = useResponsivePageSize({ reservedHeight: 280, rowHeight: 60 })
   const [openCreateModal, setOpenCreateModal] = useState(false)
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)

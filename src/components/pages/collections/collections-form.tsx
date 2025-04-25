@@ -41,6 +41,8 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
     }
   }, [])
 
+  console.log(form.getValues())
+
   const onSubmit = (values: CollectionFormValues) => {
     onSubmitFunction(values)
   }
@@ -48,7 +50,6 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Title */}
         <FormField
           control={form.control}
           name="title"
@@ -84,7 +85,13 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <FileUpload onChange={(url) => form.setValue('coverImage', url)} accept="image/*" />
+                <FileUpload
+                  variant="single"
+                  onChange={(id) => {
+                    form.setValue('coverImage', id[0] as any)
+                  }}
+                  accept="image/*"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

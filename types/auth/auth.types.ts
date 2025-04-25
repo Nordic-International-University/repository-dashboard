@@ -42,4 +42,8 @@ export interface AuthUser {
     id: string
     name: string
   }
+  permissions: {
+    key: string
+    module: string
+  }[]
 }

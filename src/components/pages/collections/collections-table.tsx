@@ -35,6 +35,7 @@ const CollectionsTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/50 transition-colors">
+            <TableHead>Rasm</TableHead> {/* ✅ Yangi ustun */}
             <TableHead>Sarlavha</TableHead>
             <TableHead>Tavsif</TableHead>
             <TableHead>Yaratilgan sana</TableHead>
@@ -42,10 +43,18 @@ const CollectionsTable = ({
             <TableHead className="text-center">Amallar</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {collections?.length ? (
             collections.map((item) => (
               <TableRow key={item.id} className="hover:bg-muted/20 transition-colors">
+                <TableCell>
+                  <img
+                    src={item.coverImage}
+                    alt={item.title}
+                    className="h-12 w-12 rounded-full border object-cover"
+                  />
+                </TableCell>
                 <TableCell className="font-medium">{item.title}</TableCell>
                 <TableCell className="text-muted-foreground line-clamp-2">
                   {item.description}
@@ -70,7 +79,7 @@ const CollectionsTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-muted-foreground py-6 text-center">
+              <TableCell colSpan={6} className="text-muted-foreground py-6 text-center">
                 Bo'lim mavjud emas
               </TableCell>
             </TableRow>

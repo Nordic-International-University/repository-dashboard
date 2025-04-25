@@ -18,10 +18,11 @@ import {
   useUpdateCollectionMutation,
 } from '@/hooks/use-collections'
 import { CollectionsDeleteDialog } from '@/components/pages/collections/collections-delete-dialog'
+import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState<number>(1)
-  const [pageSize, setPageSize] = useState<number>(9)
+  const pageSize = useResponsivePageSize({ reservedHeight: 400, rowHeight: 60 })
   const [openCreateModal, setOpenCreateModal] = useState<boolean>(false)
   const [openUpdateModal, setOpenUpdateModal] = useState<boolean>(false)
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false)
@@ -34,13 +35,16 @@ const Page = () => {
   const CollectionUpdateMutation = useUpdateCollectionMutation(refetch)
 
   const addCollection = (values: CollectionFormValues) => {
-    CollectionsCreateMutation.mutate(values)
-    setOpenCreateModal(false)
+    CollectionsCreateMutation.mutate(values, {
+      onSuccess: () => {
+        setOpenCreateModal(false)
+      },
+    })
   }
 
   const updateCollection = (values: CollectionFormValues) => {
     if (!editData) return
-    CollectionUpdateMutation.mutate({ payload: values, id: editData.id })
+    CollectionUpdateMutation.mutate({ payload: values, id: editData.id }, {})
     setOpenUpdateModal(false)
   }
 
@@ -83,8 +87,6 @@ const Page = () => {
       >
         <CollectionForm onSubmitFunction={addCollection} />
       </DialogModal>
-
-      {/* Update Modal */}
       <DialogModal
         title="Bo'limni tahrirlash"
         open={openUpdateModal}

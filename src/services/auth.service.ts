@@ -23,7 +23,7 @@ export const authService = {
   },
 
   getProfile: async (): Promise<AuthUser> => {
-    const { data } = await axiosInstance.get('/api/v1/auth/profile')
+    const { data } = await axiosInstance.get('/auth/profile')
     return data
   },
 

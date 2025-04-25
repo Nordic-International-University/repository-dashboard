@@ -11,7 +11,7 @@ export const useKeywordsQuery = (pageNumber: number, pageSize: number, search?: 
 export const useCreateKeywordMutation = (onSuccess?: () => void) =>
   // @ts-ignore
   useMutation((data: KeywordFormValues) => keywordService.create(data), {
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Kalit so'z yaratildi")
       onSuccess?.()
     },

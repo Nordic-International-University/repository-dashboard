@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/pagination'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 interface PaginationProps {
   currentPage: number
@@ -71,7 +72,7 @@ const CustomPagination = ({
               isActive={page === currentPage}
               onClick={() => onPageChange(page)}
               className={`rounded-full px-3 py-2 text-center ${
-                page === currentPage ? 'bg-primary text-white' : ''
+                page === currentPage ? 'bg-primary' : ''
               }`}
             >
               {page}
@@ -112,12 +113,7 @@ const CustomPagination = ({
             min={1}
             max={totalPages}
           />
-          <button
-            onClick={handleJump}
-            className="bg-primary hover:bg-primary/90 rounded-md px-3 py-1 text-sm text-white"
-          >
-            O‘tish
-          </button>
+          <Button onClick={handleJump}>O‘tish</Button>
         </PaginationItem>
       </PaginationContent>
     </Pagination>

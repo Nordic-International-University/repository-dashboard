@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input'
 import { categoryService } from '@/services/category.service'
 import type { Category } from '@/../types/category/category.types'
 import CustomPagination from '@/components/pagination/CustomPagination'
+import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
 interface CategoryTableProps {
   onEdit: (category: Category) => void
   onDelete: (category: Category) => void
@@ -33,7 +34,7 @@ interface CategoryTableProps {
 
 export function CategoryTable({ onEdit, onDelete, AddCategoryButton }: CategoryTableProps) {
   const [pageNumber, setPageNumber] = useState<number>(1)
-  const [pageSize, setPageSize] = useState<number>(9)
+  const pageSize = useResponsivePageSize({ reservedHeight: 280, rowHeight: 60 })
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState<string>('')
 

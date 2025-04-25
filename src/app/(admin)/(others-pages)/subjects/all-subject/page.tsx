@@ -15,10 +15,11 @@ import SubjectTable from '@/components/pages/subjects/subject-table'
 import { DialogModal } from '@/components/modal/custom.modal'
 import { SubjectForm } from '@/components/pages/subjects/subject-form'
 import { SubjectDeleteDialog } from '@/components/pages/subjects/subject-delete-dialog'
+import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState(1)
-  const [pageSize] = useState(9)
+  const pageSize = useResponsivePageSize({ reservedHeight: 280, rowHeight: 60 })
   const [openCreateModal, setOpenCreateModal] = useState(false)
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)

@@ -33,7 +33,7 @@ export const collectionsService = {
       return data
     } catch (error) {
       console.error('Failed to create collection:', error)
-      throw new Error('Failed to create collection. Check input data or duplicates.')
+      throw error
     }
   },
 

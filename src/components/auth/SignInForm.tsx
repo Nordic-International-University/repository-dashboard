@@ -17,7 +17,7 @@ import React, { useState } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formSchema } from '@/schemes/auth.scheme'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { authLogin } from '@/services/auth.service'
 import { toast } from '@/components/toast/toast'
 import { useRouter } from 'next/navigation'
@@ -36,12 +36,15 @@ export default function SignInForm() {
       password: '',
     },
   })
+  const queryClient = useQueryClient()
 
   const AuthMutation = useMutation(authLogin, {
     onSuccess: (data: AuthResponse) => {
       Cookie.set('access_token', data.accessToken)
+      Cookie.set('refresh_token', data.refreshToken)
       setAuthenticated(true)
       toast('Muvaffaqiyatli kirildi!', '', () => console.log('success'))
+      queryClient.invalidateQueries(['getPermissions'])
       router.push('/')
     },
     onError: (error: Error) => {
