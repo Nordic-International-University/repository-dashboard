@@ -55,7 +55,7 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CategoryFormSchema }) =>
-      categoryService.updateCategory(id, data),
+      categoryService.updateCategory(id, data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       toast.success('Category updated successfully')

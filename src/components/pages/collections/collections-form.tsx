@@ -99,7 +99,7 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
         />
 
         <div className="itmes-center flex justify-end">
-          <Button type="submit">Bolim yaratish</Button>
+          <Button type="submit">{initialData ? 'tahrirlash' : 'yaratish'}</Button>
         </div>
       </form>
     </Form>

@@ -83,7 +83,11 @@ const Page = () => {
         open={openUpdateModal}
         onClose={() => setOpenUpdateModal(false)}
       >
-        <SubjectForm onSubmitFunction={updateSubject} initialData={editData ?? undefined} />
+        <SubjectForm
+          key={editData?.id}
+          onSubmitFunction={updateSubject}
+          initialData={editData ?? undefined}
+        />
       </DialogModal>
       {openDeleteModal && (
         <SubjectDeleteDialog

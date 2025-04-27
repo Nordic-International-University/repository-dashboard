@@ -36,13 +36,13 @@ export const SubjectForm = ({ onSubmitFunction, initialData }: SubjectFormProps)
   const { data: categories } = useCategoriesQuery()
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && categories?.data) {
       form.reset({
         name: initialData.name,
         categoryId: initialData.category?.id ?? '',
       })
     }
-  }, [initialData])
+  }, [initialData, categories])
 
   const onSubmit = form.handleSubmit(onSubmitFunction)
 
@@ -63,15 +63,17 @@ export const SubjectForm = ({ onSubmitFunction, initialData }: SubjectFormProps)
             </FormItem>
           )}
         />
-
-        {/* Kategoriya (yo‘nalish) tanlash */}
         <FormField
           control={form.control}
           name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Yo'nalish</FormLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                key={form.watch('categoryId')}
+                value={field.value}
+                onValueChange={field.onChange}
+              >
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Yo'nalishni tanlang" />

@@ -165,8 +165,8 @@ export const navItems: NavItem[] = [
         permissionModule: 'user',
       },
       {
-        name: 'Yangi foydalanuvchi',
-        path: '/admin/users/new',
+        name: 'Audit loglar',
+        path: '/audit-logs',
         pro: false,
         permissionModule: 'user',
       },
