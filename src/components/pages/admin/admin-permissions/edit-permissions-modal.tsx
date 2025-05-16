@@ -46,7 +46,7 @@ const EditPermissionModal: FC<EditPermissionModalProps> = ({
     },
   })
 
-  console.log(initialData)
+  console.log(form.getValues())
 
   useEffect(() => {
     if (initialData) {

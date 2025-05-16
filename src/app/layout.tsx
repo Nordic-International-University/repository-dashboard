@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/context/ThemeContext'
 import QueryProvider from '@/lib/query.provider'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/components/auth/auth-context'
+import SettingsDrawer from '@/components/modal/setttings-drawwer'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -29,6 +30,7 @@ export default function RootLayout({
           {/*</ReduxProvider>*/}
         </QueryProvider>
         <Toaster />
+        <SettingsDrawer />
       </body>
     </html>
   )

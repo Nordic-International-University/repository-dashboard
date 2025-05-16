@@ -170,10 +170,7 @@ export default function AdminUsers() {
                   />
                 </div>
 
-                <Button
-                  className="bg-black hover:bg-gray-800 dark:bg-[white]"
-                  onClick={() => setIsAddUserModalOpen(true)}
-                >
+                <Button className="" onClick={() => setIsAddUserModalOpen(true)}>
                   <UserPlus className="mr-2 h-4 w-4" />
                   Admin Foydalanuvchi Qo'shish
                 </Button>

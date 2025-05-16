@@ -73,38 +73,38 @@ export default function UserDropdown() {
           </span>
         </div>
 
-        <ul className="flex flex-col gap-1 border-b border-gray-200 pt-4 pb-3 dark:border-gray-800">
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/profile"
-              className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
-            >
-              Edit profile
-            </DropdownItem>
-          </li>
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/settings"
-              className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
-            >
-              Account settings
-            </DropdownItem>
-          </li>
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/support"
-              className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
-            >
-              Support
-            </DropdownItem>
-          </li>
-        </ul>
+        {/*<ul className="flex flex-col gap-1 border-b border-gray-200 pt-4 pb-3 dark:border-gray-800">*/}
+        {/*  <li>*/}
+        {/*    <DropdownItem*/}
+        {/*      onItemClick={closeDropdown}*/}
+        {/*      tag="a"*/}
+        {/*      href="/profile"*/}
+        {/*      className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"*/}
+        {/*    >*/}
+        {/*      Edit profile*/}
+        {/*    </DropdownItem>*/}
+        {/*  </li>*/}
+        {/*  <li>*/}
+        {/*    <DropdownItem*/}
+        {/*      onItemClick={closeDropdown}*/}
+        {/*      tag="a"*/}
+        {/*      href="/settings"*/}
+        {/*      className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"*/}
+        {/*    >*/}
+        {/*      Account settings*/}
+        {/*    </DropdownItem>*/}
+        {/*  </li>*/}
+        {/*  <li>*/}
+        {/*    <DropdownItem*/}
+        {/*      onItemClick={closeDropdown}*/}
+        {/*      tag="a"*/}
+        {/*      href="/support"*/}
+        {/*      className="group text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"*/}
+        {/*    >*/}
+        {/*      Support*/}
+        {/*    </DropdownItem>*/}
+        {/*  </li>*/}
+        {/*</ul>*/}
 
         <div
           onClick={() => {

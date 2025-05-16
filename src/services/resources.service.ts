@@ -11,35 +11,59 @@ export const resourceTypeService = {
     pageSize: number,
     search?: string
   ): Promise<PaginatedResponse<ResourceType>> => {
-    const { data } = await axiosInstance.get('/resource-type', {
-      params: {
-        pageNumber,
-        pageSize,
-        search,
-      },
-    })
-    return data
+    try {
+      const { data } = await axiosInstance.get('/resource-type', {
+        params: { pageNumber, pageSize, search },
+      })
+      return data
+    } catch (error) {
+      console.error('Failed to fetch resource types:', error)
+      throw error
+    }
   },
 
   getResourceType: async (id: string): Promise<ResourceType> => {
-    const { data } = await axiosInstance.get(`/resource-type/${id}`)
-    return data
+    try {
+      const { data } = await axiosInstance.get(`/resource-type/${id}`)
+      return data
+    } catch (error) {
+      console.error(`Failed to fetch resource type with id ${id}:`, error)
+      throw error
+    }
   },
 
   createResourceType: async (payload: ResourceTypeFormValues): Promise<ResourceType> => {
-    const { data } = await axiosInstance.post('/resource-type', payload)
-    return data
+    try {
+      const { data } = await axiosInstance.post('/resource-type', payload)
+      return data
+    } catch (error) {
+      console.error('Failed to create resource type:', error)
+      throw error
+    }
   },
 
   updateResourceType: async (
     id: string,
     payload: ResourceTypeFormValues
   ): Promise<ResourceType> => {
-    const { data } = await axiosInstance.patch(`/resource-type/${id}`, { id, ...payload })
-    return data
+    try {
+      const { data } = await axiosInstance.patch(`/resource-type/${id}`, {
+        id,
+        ...payload,
+      })
+      return data
+    } catch (error) {
+      console.error(`Failed to update resource type with id ${id}:`, error)
+      throw error
+    }
   },
 
   deleteResourceType: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/resource-type/${id}`)
+    try {
+      await axiosInstance.delete(`/resource-type/${id}`)
+    } catch (error) {
+      console.error(`Failed to delete resource type with id ${id}:`, error)
+      throw error
+    }
   },
 }

@@ -4,10 +4,10 @@ import type { CollectionFormValues } from '@/../types/colecctions/collections.ty
 import { collectionsService } from '@/services/collections.service'
 import { AxiosError } from 'axios'
 
-export const useCollectionsQuery = (pageNumber: number, pageSize: number) => {
+export const useCollectionsQuery = (pageNumber: number, pageSize: number, search?: string) => {
   return useQuery({
-    queryKey: ['collections', pageNumber, pageSize],
-    queryFn: () => collectionsService.getCollections({ pageNumber, pageSize }),
+    queryKey: ['collections', pageNumber, pageSize, search],
+    queryFn: () => collectionsService.getCollections({ pageNumber, pageSize, search }),
   })
 }
 

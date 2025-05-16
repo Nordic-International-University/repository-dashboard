@@ -214,7 +214,8 @@ export const UpdatePermission = async ({
   id: string
 }): Promise<void> => {
   try {
-    await axiosInstance.patch(`/permission/${id}`, data)
+    const res = await axiosInstance.patch(`/permission/${id}`, data)
+    console.log(res)
   } catch (error) {
     console.log(error)
     if (error instanceof AxiosError) {
@@ -223,9 +224,16 @@ export const UpdatePermission = async ({
         status: error.response?.status,
         data: error.response?.data,
       })
+      
+      if (error.response?.data?.message === 'Insufficient permissions') {
+        const customError = new Error('Bu amal uchun sizda ruxsat yo\'q')
+        customError.name = 'PermissionError'
+        throw customError
+      }
     } else {
       console.error("Noma'lum xato yuz berdi:", error)
     }
+    throw error
   }
 }
 
@@ -249,6 +257,7 @@ export const UpdateRole = async ({
     } else {
       console.error("Noma'lum xato yuz berdi:", error)
     }
+    throw error
   }
 }
 

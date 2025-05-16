@@ -2,6 +2,7 @@ import { useMutation, useQuery } from 'react-query'
 import { resourceTypeService } from '@/services/resources.service'
 import { ResourceTypeFormValues } from '../../types/resources/rosurce.types'
 import { toast } from 'sonner'
+import { AxiosError } from 'axios'
 
 export const useResourceTypesQuery = (pageNumber: number, pageSize: number) =>
   useQuery({
@@ -16,8 +17,8 @@ export const useCreateResourceTypeMutation = (onSuccess?: () => void) =>
       toast.success('Resurs turi muvaffaqiyatli qo‘shildi')
       onSuccess?.()
     },
-    onError: () => {
-      toast.error('Resurs turini qo‘shishda xatolik yuz berdi')
+    onError: (error: AxiosError | any) => {
+      toast.error(error?.response?.data?.message || 'nomalum xatolik')
     },
   })
 
@@ -29,8 +30,8 @@ export const useUpdateResourceTypeMutation = (onSuccess?: () => void) =>
       toast.success('Resurs turi yangilandi')
       onSuccess?.()
     },
-    onError: () => {
-      toast.error('Resurs turini yangilashda xatolik yuz berdi')
+    onError: (error: AxiosError | any) => {
+      toast.error(error?.response?.data?.message || 'nomalum xatolik')
     },
   })
 
@@ -41,7 +42,7 @@ export const useDeleteResourceTypeMutation = (onSuccess?: () => void) =>
       toast.success('Resurs turi o‘chirildi')
       onSuccess?.()
     },
-    onError: () => {
-      toast.error('Resurs turini o‘chirishda xatolik yuz berdi')
+    onError: (error: AxiosError | any) => {
+      toast.error(error?.response?.data?.message || 'nomalum xatolik')
     },
   })

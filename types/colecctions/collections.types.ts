@@ -1,8 +1,12 @@
 export interface Collection {
   id: string
   title: string
+  resourceCount: number
   description: string
-  coverImage: string
+  coverImage: {
+    id: string
+    url: string
+  }
   createdAt?: string
   updatedAt?: string
 }

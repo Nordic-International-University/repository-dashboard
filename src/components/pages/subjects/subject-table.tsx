@@ -25,14 +25,13 @@ const SubjectTable = ({ subjects, onEdit, setDeleteId, setOpenDeleteModal }: Sub
     setOpenDeleteModal(true)
   }
 
-  console.log(subjects)
   return (
     <div className="overflow-hidden rounded-xl shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/50 transition-colors">
             <TableHead>Nomi</TableHead>
-            <TableHead>Kategoriya ID</TableHead>
+            <TableHead>Yo'nalish nomi</TableHead>
             <TableHead>Yaratilgan sana</TableHead>
             <TableHead>Tahrirlangan sana</TableHead>
             <TableHead className="text-center">Amallar</TableHead>
@@ -43,7 +42,7 @@ const SubjectTable = ({ subjects, onEdit, setDeleteId, setOpenDeleteModal }: Sub
             subjects.map((item) => (
               <TableRow key={item.id} className="hover:bg-muted/20 transition-colors">
                 <TableCell className="font-medium">{item.name}</TableCell>
-                <TableCell>{item.categoryId}</TableCell>
+                <TableCell>{item.category.name}</TableCell>
                 <TableCell>{dayjs(item.createdAt).format('DD-MM-YYYY')}</TableCell>
                 <TableCell>{dayjs(item.updatedAt).format('DD-MM-YYYY')}</TableCell>
                 <TableCell className="text-center">

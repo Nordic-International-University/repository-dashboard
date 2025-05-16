@@ -162,10 +162,7 @@ export default function RolesManagement() {
               />
             </div>
 
-            <Button
-              className="bg-black text-white hover:bg-gray-800"
-              onClick={() => setIsAddRoleModalOpen(true)}
-            >
+            <Button onClick={() => setIsAddRoleModalOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Rol Qo'shish
             </Button>

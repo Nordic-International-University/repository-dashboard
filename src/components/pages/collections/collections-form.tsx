@@ -36,20 +36,21 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
       form.reset({
         title: initialData.title,
         description: initialData.description,
-        coverImage: initialData.coverImage,
+        // @ts-ignore
+        coverImage: initialData.coverImage.id,
       })
     }
   }, [])
 
-  console.log(form.getValues())
 
   const onSubmit = (values: CollectionFormValues) => {
     onSubmitFunction(values)
   }
 
+    console.log(initialData)
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
         <FormField
           control={form.control}
           name="title"
@@ -82,16 +83,23 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
         <FormField
           control={form.control}
           name="coverImage"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormControl>
-                <FileUpload
-                  variant="single"
-                  onChange={(id) => {
-                    form.setValue('coverImage', id[0] as any)
-                  }}
-                  accept="image/*"
-                />
+                  <FileUpload
+                      variant="single"
+                      onChange={(id) => {
+                          form.setValue('coverImage', id[0] as any)
+                      }}
+                      accept="image/*"
+                      initialFiles={initialData?.coverImage ? [{
+                          id: initialData.coverImage.id,
+                          url: initialData.coverImage.url,
+                          name: 'cover-image',
+                          mimetype: 'image/jpeg',
+                          size: 0
+                      }] : []}
+                  />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -99,7 +107,9 @@ export const CollectionForm = ({ onSubmitFunction, initialData }: CollectionForm
         />
 
         <div className="itmes-center flex justify-end">
-          <Button type="submit">{initialData ? 'tahrirlash' : 'yaratish'}</Button>
+          <Button className="mt-3" type="submit">
+            {initialData ? 'tahrirlash' : 'yaratish'}
+          </Button>
         </div>
       </form>
     </Form>

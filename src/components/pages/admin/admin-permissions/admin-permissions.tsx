@@ -30,10 +30,9 @@ export default function PermissionsManagement() {
     queryFn: () => fetchAllPermission(),
   })
 
-  console.log(permissions)
 
   const CreatePermissionMutation = useMutation(addPermissions, {
-    onSuccess: (data) => {
+    onSuccess: () => {
       refetch()
     },
     onError: (error) => {
@@ -94,10 +93,7 @@ export default function PermissionsManagement() {
               />
             </div>
 
-            <Button
-              className="bg-black hover:bg-gray-800"
-              onClick={() => setIsAddPermissionModalOpen(true)}
-            >
+            <Button onClick={() => setIsAddPermissionModalOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Ruxsat Qo'shish
             </Button>

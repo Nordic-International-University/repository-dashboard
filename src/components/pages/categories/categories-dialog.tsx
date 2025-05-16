@@ -16,21 +16,21 @@ interface CategoryDialogProps {
 }
 
 export function CategoryDialog({ open, onOpenChange, category, mode }: CategoryDialogProps) {
-  const title = mode === 'create' ? 'Create Category' : 'Edit Category'
+  const title = mode === 'create' ? 'Yangi yo‘nalish yaratish' : 'Yo‘nalishni tahrirlash'
   const description =
-      mode === 'create'
-          ? 'Add a new category to your collection.'
-          : 'Update the details of this category.'
+    mode === 'create'
+      ? 'Kolleksiyangizga yangi yo‘nalish qo‘shing.'
+      : 'Ushbu yo‘nalish tafsilotlarini yangilang.'
 
   return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <CategoryForm initialData={category} onSuccess={() => onOpenChange(false)} />
-        </DialogContent>
-      </Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <CategoryForm initialData={category} onSuccess={() => onOpenChange(false)} />
+      </DialogContent>
+    </Dialog>
   )
 }

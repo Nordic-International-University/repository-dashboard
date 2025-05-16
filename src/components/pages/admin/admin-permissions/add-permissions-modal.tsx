@@ -40,6 +40,7 @@ const AddPermissionsModal: FC<AddPermissionModalProps> = ({
     },
   })
 
+    console.log(form.getValues())
   const onSubmit = (data: PermissionCreateBody) => {
     handleCreatePermission(data)
     form.reset()

@@ -3,7 +3,10 @@ import { AuditLog, AuditLogQuery } from '../../types/audit/audit.types'
 
 interface AuditLogResponse {
   data: AuditLog[]
-  total: number
+  count: number
+  pageNumber: number
+  pageSize: number
+  pageCount: number
 }
 
 export const auditLogService = {

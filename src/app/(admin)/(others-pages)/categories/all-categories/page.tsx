@@ -28,20 +28,18 @@ export default function Page() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Barcha yo'nalishlar" />
+      <PageBreadcrumb pageTitle="Barcha yo‘nalishlar" />
       <CategoryTable
         onEdit={handleEdit}
         onDelete={handleDelete}
-        AddCategoryButton={() => {
-          return (
-            <div className="flex items-center justify-between">
-              <Button onClick={() => setCreateDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Category
-              </Button>
-            </div>
-          )
-        }}
+        AddCategoryButton={() => (
+          <div className="flex items-center justify-between">
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Yo‘nalish qo‘shish
+            </Button>
+          </div>
+        )}
       />
 
       <CategoryDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} mode="create" />

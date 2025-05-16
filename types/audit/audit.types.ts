@@ -1,5 +1,9 @@
 export interface AuditLog {
-  user: any
+  user: {
+    id: string
+    fullname: string
+    username: string
+  }
   id: string
   action: string
   module: string

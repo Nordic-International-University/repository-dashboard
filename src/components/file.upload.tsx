@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Upload, Button, Tooltip, List, Typography } from 'antd'
-import { UploadOutlined, DeleteOutlined, FileOutlined } from '@ant-design/icons'
+import { Upload, Tooltip, List, Typography } from 'antd'
+import { UploadOutlined, DeleteOutlined, FileOutlined, InboxOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
 import { toast } from 'sonner'
 import { axiosInstance } from '@/services/base.axios'
+
+const { Dragger } = Upload
 
 interface FileMeta {
   id: string
@@ -106,7 +108,9 @@ const FileUploadAntd: React.FC<FileUploadProps> = ({
           return file.type === type
         })
       if (!isAccepted) {
-        toast('❌ Fayl formati noto‘g‘ri', { description: `Ruxsat etilgan: ${accept}` })
+        toast('❌ Fayl formati noto‘g‘ri', {
+          description: `Ruxsat etilgan: ${accept}`,
+        })
       }
       return isAccepted
     },
@@ -114,13 +118,15 @@ const FileUploadAntd: React.FC<FileUploadProps> = ({
 
   return (
     <div className={className}>
-      {label && <div className="mb-2 font-medium">{label}</div>}
+      {label && <div className="font-medium">{label}</div>}
 
-      <Upload {...uploadProps}>
-        <Button className="w-full" icon={<UploadOutlined />}>
-          Fayl tanlash
-        </Button>
-      </Upload>
+      <Dragger {...uploadProps} className="w-full">
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="text-base font-medium">Faylni bu yerga torting yoki bosing</p>
+        <p className="text-sm text-gray-500">Ruxsat etilgan formatlar: {accept}</p>
+      </Dragger>
 
       {fileList.length > 0 && (
         <List
@@ -136,12 +142,12 @@ const FileUploadAntd: React.FC<FileUploadProps> = ({
                   </a>
                 </Tooltip>,
                 <Tooltip title="O'chirish" key="delete">
-                  <Button
-                    danger
-                    type="text"
-                    icon={<DeleteOutlined />}
+                  <button
                     onClick={() => handleRemove(file.id)}
-                  />
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <DeleteOutlined />
+                  </button>
                 </Tooltip>,
               ]}
             >

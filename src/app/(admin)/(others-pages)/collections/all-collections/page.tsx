@@ -19,17 +19,27 @@ import {
 } from '@/hooks/use-collections'
 import { CollectionsDeleteDialog } from '@/components/pages/collections/collections-delete-dialog'
 import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
+import { Input } from '@/components/ui/input'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState<number>(1)
-  const pageSize = useResponsivePageSize({ reservedHeight: 400, rowHeight: 60 })
+  const pageSize = useResponsivePageSize({ reservedHeight: 400, rowHeight: 65 })
   const [openCreateModal, setOpenCreateModal] = useState<boolean>(false)
   const [openUpdateModal, setOpenUpdateModal] = useState<boolean>(false)
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState('')
   const [editData, setEditData] = useState<Collection | null>(null)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('')
 
-  const { data: collections, refetch } = useCollectionsQuery(pageNumber, pageSize)
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value)
+    setTimeout(() => {
+      setDebouncedSearch(e.target.value)
+      setPageNumber(1)
+    }, 500)
+  }
+  const { data: collections, refetch } = useCollectionsQuery(pageNumber, pageSize, debouncedSearch)
   const CollectionsCreateMutation = useCreateCollectionMutation(refetch)
   const CollectionDeleteMutation = useDeleteCollectionMutation(refetch)
   const CollectionUpdateMutation = useUpdateCollectionMutation(refetch)
@@ -60,10 +70,14 @@ const Page = () => {
   return (
     <div>
       <PageBreadcrumb pageTitle="Barcha bo'limlar" />
-      <div className="flex items-center justify-end">
-        <Button onClick={() => setOpenCreateModal(true)} className="mb-4">
-          Bo'lim qo'shish
-        </Button>
+      <div className="mb-4 flex items-center justify-between max-sm:gap-5">
+        <Input
+          placeholder="Bo'lim bo'yicha qidirish..."
+          value={search}
+          onChange={handleSearchChange}
+          className="max-w-sm"
+        />
+        <Button onClick={() => setOpenCreateModal(true)}>Bo'lim qo'shish</Button>
       </div>
       <div className="rounded-md border-1 px-2 py-2">
         <CollectionsTable
@@ -94,8 +108,6 @@ const Page = () => {
       >
         <CollectionForm onSubmitFunction={updateCollection} initialData={editData ?? undefined} />
       </DialogModal>
-
-      {/* Delete Dialog */}
       {openDeleteModal && (
         <CollectionsDeleteDialog
           close={() => setOpenDeleteModal(false)}

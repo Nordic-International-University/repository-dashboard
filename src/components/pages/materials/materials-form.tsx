@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useCollectionsQuery } from '@/hooks/use-collections'
 import { useSubjectsQuery } from '@/hooks/use-subject'
@@ -28,7 +28,10 @@ import { resourceFormScheme } from '@/schemes/material.scheme'
 import { useResourceTypesQuery } from '@/hooks/use-resources'
 import { useCreateKeywordMutation, useKeywordsQuery } from '@/hooks/use-keywords'
 import FileUpload from '@/components/file.upload'
-import { CustomMultiSelectInput } from '@/components/input/custom-multi-select'
+import { AntdMultiSelect } from '@/components/input/custom-multi-select'
+import { Textarea } from '@/components/ui/textarea'
+import { useAuthorsQuery, useCreateAuthorMutation } from '@/hooks/use-authors'
+import { resourceService } from '@/services/materials.service'
 
 interface Props {
   onSubmitFunction: (data: ResourceFormValues) => void
@@ -48,6 +51,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
       collectionId: '',
       subjectId: '',
       resourceTypeId: '',
+      authors: [],
       documents: [],
       keywords: [],
     },
@@ -58,73 +62,65 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
   const { data: subjects } = useSubjectsQuery(1, 1000)
   const { data: resourceTypes } = useResourceTypesQuery(1, 1000)
   const { data: keywords, refetch } = useKeywordsQuery(1, 1000)
+  const { data: authors, refetch: authorRefetch } = useAuthorsQuery(1, 10000)
   const createMutation = useCreateKeywordMutation()
 
+  const [loadedData, setLoadedData] = useState<any>(null)
+
   useEffect(() => {
-    if (!initialData) {
-      form.reset({
-        title: '',
-        description: '',
-        doi: '',
-        language: '',
-        license: '',
-        collectionId: '',
-        subjectId: '',
-        resourceTypeId: '',
-        documents: [],
-        keywords: [],
-      })
-      return
-    }
-
-    console.log(form.getValues())
-    if (collections?.data && subjects?.data && resourceTypes?.data && keywords?.data) {
-      console.log('Normalizing and setting form data', initialData)
-
-      const collectionId = collections.data.find((c) => c.title === initialData.collection)?.id
-      console.log('Found collection ID:', collectionId)
-
-      // Find the subject ID
-      const subjectId = subjects.data.find((s) => s.name === initialData.subject)?.id
-      console.log('Found subject ID:', subjectId)
-
-      // Find the resource type ID
-      const resourceTypeId = resourceTypes.data.find((r) => r.name === initialData.resourceType)?.id
-      console.log('Found resource type ID:', resourceTypeId)
-
-      // Map keywords
-      const keywordIds =
-        initialData.keywords
-          ?.map((k: any) => {
-            const found = keywords.data?.find((kw) => kw.value === k.value)
-            return found?.id
-          })
-          .filter(Boolean) || []
-      console.log('Mapped keyword IDs:', keywordIds)
-
-      // Map documents
-      const documentIds = initialData.documents?.map((d: any) => d.id).filter(Boolean) || []
-
-      const normalized = {
-        title: initialData.title,
-        description: initialData.description,
-        doi: initialData.doi || '',
-        license: initialData.license || '',
-        language: initialData.language || '',
-        collectionId: collectionId || '',
-        subjectId: subjectId || '',
-        resourceTypeId: resourceTypeId || '',
-        keywords: keywordIds,
-        documents: documentIds,
+    const fetchInitialData = async () => {
+      if (initialData?.id) {
+        try {
+          const data = await resourceService.getResource(initialData.id)
+          setLoadedData(data)
+        } catch (err) {
+          console.error('Resursni yuklashda xatolik:', err)
+        }
       }
-
-      console.log('Setting form values to:', initialData)
-
-      setTimeout(() => {
-        form.reset(normalized)
-      }, 0)
     }
-  }, [initialData, collections, subjects, resourceTypes, keywords, form])
+
+    fetchInitialData()
+  }, [initialData?.id])
+  console.log(loadedData)
+  useEffect(() => {
+    if (
+      !loadedData ||
+      !collections?.data ||
+      !subjects?.data ||
+      !resourceTypes?.data ||
+      !keywords?.data
+    )
+      return
+
+    const collectionId = loadedData.collection?.id || ''
+    const subjectId = loadedData.subject?.id || ''
+    const resourceTypeId = loadedData.resourceType?.id || ''
+    const keywordIds =
+      loadedData.keywords
+        ?.map((k: any) => keywords.data?.find((kw) => kw.value === k.value)?.id)
+        .filter(Boolean) || []
+    const documentIds = loadedData.documents?.map((d: any) => d.id).filter(Boolean) || []
+    const authorIds = loadedData.authors?.map((a: any) => a.id).filter(Boolean) || []
+
+    const normalized = {
+      title: loadedData.title,
+      description: loadedData.description,
+      doi: loadedData.doi || '',
+      license: loadedData.license || '',
+      language: loadedData.language || '',
+      collectionId,
+      subjectId,
+      resourceTypeId,
+      keywords: keywordIds,
+      documents: documentIds,
+      authors: authorIds,
+    }
+
+    console.log('Resetting form with:', normalized)
+    setTimeout(() => {
+      form.reset(normalized)
+    }, 0)
+  }, [loadedData, collections, subjects, resourceTypes, keywords, form])
 
   // @ts-ignore
   const onSubmit = form.handleSubmit(onSubmitFunction)
@@ -151,10 +147,10 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
           )}
         />
         {[
-          { name: 'description', label: 'Tavsif' },
-          { name: 'doi', label: 'DOI' },
-          { name: 'license', label: 'Litsenziya' },
-        ].map(({ name, label }) => (
+          { name: 'description', label: 'Tavsif', type: 'textarea' },
+          { name: 'doi', label: 'DOI', type: 'input' },
+          { name: 'license', label: 'Litsenziya', type: 'input' },
+        ].map(({ name, label, type }) => (
           <FormField
             key={name}
             name={name as keyof ResourceFormValues}
@@ -162,7 +158,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
               <FormItem>
                 <FormLabel>{label}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  {type === 'input' ? <Input {...field} /> : <Textarea {...field} />}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -236,15 +232,15 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
             <FormItem>
               <FormLabel>Kalit so‘zlar</FormLabel>
               <FormControl>
-                <CustomMultiSelectInput
-                  value={field.value || []}
+                <AntdMultiSelect
+                  value={field.value}
+                  onChange={field.onChange}
                   options={
                     keywords?.data?.map((k) => ({
                       label: k.value,
                       value: k.id,
                     })) || []
                   }
-                  onChange={field.onChange}
                   onCreate={async (input) => {
                     const created = await createMutation.mutateAsync({ value: input })
                     await refetch()
@@ -254,6 +250,30 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                       value: created.id,
                     }
                   }}
+                  mode="multiple"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="authors"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Muallifni tanlang</FormLabel>
+              <FormControl>
+                <AntdMultiSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={
+                    authors?.data?.map((k) => ({
+                      label: k.fullname,
+                      value: k.id,
+                    })) || []
+                  }
+                  mode="multiple"
                 />
               </FormControl>
               <FormMessage />
@@ -265,7 +285,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
           variant="multiple"
           accept="*"
           initialFiles={
-            initialData?.documents?.map((doc: any) => ({
+            loadedData?.documents?.map((doc: any) => ({
               id: doc.id,
               name: doc.filename,
               mimetype: doc.mimetype || 'application/octet-stream',

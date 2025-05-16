@@ -15,14 +15,13 @@ import {
   PlugInIcon,
   UserCircleIcon,
 } from '../icons/index'
-import { FiBarChart } from 'react-icons/fi'
-import { CiSettings } from 'react-icons/ci'
 import { GrResources } from 'react-icons/gr'
 import { FaBook } from 'react-icons/fa'
 import { VscSymbolKeyword } from 'react-icons/vsc'
 import { useQuery } from 'react-query'
 import { authService } from '@/services/auth.service'
 import { AuthUser } from '../../types/auth/auth.types'
+import useMediaQuery from 'react-query/types/devtools/useMediaQuery'
 
 type NavItem = {
   name: string
@@ -60,13 +59,13 @@ export const navItems: NavItem[] = [
   {
     icon: <FolderIcon />,
     name: "Yo'nalishlar",
-    permissionModule: 'categories',
+    permissionModule: 'category',
     subItems: [
       {
         name: "Barcha Yo'nalishlar",
         path: '/categories/all-categories',
         pro: false,
-        permissionModule: 'categories',
+        permissionModule: 'category',
       },
     ],
   },
@@ -110,34 +109,53 @@ export const navItems: NavItem[] = [
     ],
   },
   {
+    icon: <VscSymbolKeyword size={18} />,
+    name: `Mulliflar`,
+    permissionModule: 'author',
+    subItems: [
+      {
+        name: `Barcha Mulliflar`,
+        path: '/authors/all-author',
+        pro: false,
+        permissionModule: 'author',
+      },
+    ],
+  },
+  {
     icon: <FileIcon />,
     name: 'Materiallar',
-    permissionModule: 'materials',
+    permissionModule: 'resource',
     subItems: [
       {
         name: 'Barcha materiallar',
         path: '/materials/all-materials',
         pro: false,
-        permissionModule: 'materials',
+        permissionModule: 'resource',
       },
       {
-        name: 'Yangi material qo‘shish',
-        path: '/admin/items/new',
+        name: `Yangi matariallar`,
+        path: '/materials/new-materials',
         pro: false,
-        permissionModule: 'materials',
+        permissionModule: 'resource',
       },
       {
-        name: 'Tasdiqlanishi kerak',
-        path: '/admin/items/pending',
+        name: `Tasdiqlanishi kerak bo'lgan materiallar`,
+        path: '/materials/change-requests',
         pro: false,
-        permissionModule: 'materials',
+        permissionModule: 'resource',
       },
-      {
-        name: 'Arxivdagilar',
-        path: '/admin/items/archived',
-        pro: false,
-        permissionModule: 'materials',
-      },
+      // {
+      //   name: 'Tasdiqlanishi kerak',
+      //   path: '/admin/items/pending',
+      //   pro: false,
+      //   permissionModule: 'materials',
+      // },
+      // {
+      //   name: 'Arxivdagilar',
+      //   path: '/admin/items/archived',
+      //   pro: false,
+      //   permissionModule: 'materials',
+      // },
     ],
   },
   {
@@ -159,12 +177,6 @@ export const navItems: NavItem[] = [
     permissionModule: 'subjects',
     subItems: [
       {
-        name: 'Foydalanuvchilar',
-        path: '/admin/users',
-        pro: false,
-        permissionModule: 'user',
-      },
-      {
         name: 'Audit loglar',
         path: '/audit-logs',
         pro: false,
@@ -178,62 +190,62 @@ export const navItems: NavItem[] = [
       },
     ],
   },
-  {
-    icon: <FiBarChart size={25} />,
-    name: 'Statistika',
-    permissionModule: 'statistics',
-    subItems: [
-      {
-        name: 'Umumiy ko‘rsatkichlar',
-        path: '/admin/statistics',
-        pro: false,
-        permissionModule: 'statistics',
-      },
-      {
-        name: 'Yuklab olishlar',
-        path: '/admin/statistics/downloads',
-        pro: false,
-        permissionModule: 'statistics',
-      },
-      {
-        name: 'Ko‘rishlar',
-        path: '/admin/statistics/views',
-        pro: false,
-        permissionModule: 'statistics',
-      },
-    ],
-  },
-  {
-    icon: <CiSettings size={25} />,
-    name: 'Sozlamalar',
-    permissionModule: 'settings',
-    subItems: [
-      {
-        name: 'Sayt sozlamalari',
-        path: '/admin/settings/site',
-        pro: false,
-        permissionModule: 'settings',
-      },
-      {
-        name: 'Metadata maydonlari',
-        path: '/admin/settings/metadata',
-        pro: false,
-        permissionModule: 'settings',
-      },
-      {
-        name: 'Litsenziyalar',
-        path: '/admin/settings/licenses',
-        pro: false,
-        permissionModule: 'settings',
-      },
-      {
-        name: 'API va xavfsizlik',
-        path: '/admin/settings/api',
-        pro: false,
-        permissionModule: 'settings',
-      },
-    ],
-  },
+  // {
+  //   icon: <FiBarChart size={25} />,
+  //   name: 'Statistika',
+  //   permissionModule: 'statistics',
+  //   subItems: [
+  //     {
+  //       name: 'Umumiy ko‘rsatkichlar',
+  //       path: '/admin/statistics',
+  //       pro: false,
+  //       permissionModule: 'statistics',
+  //     },
+  //     {
+  //       name: 'Yuklab olishlar',
+  //       path: '/admin/statistics/downloads',
+  //       pro: false,
+  //       permissionModule: 'statistics',
+  //     },
+  //     {
+  //       name: 'Ko‘rishlar',
+  //       path: '/admin/statistics/views',
+  //       pro: false,
+  //       permissionModule: 'statistics',
+  //     },
+  //   ],
+  // },
+  // {
+  //   icon: <CiSettings size={25} />,
+  //   name: 'Sozlamalar',
+  //   permissionModule: 'settings',
+  //   subItems: [
+  //     {
+  //       name: 'Sayt sozlamalari',
+  //       path: '/admin/settings/site',
+  //       pro: false,
+  //       permissionModule: 'settings',
+  //     },
+  //     {
+  //       name: 'Metadata maydonlari',
+  //       path: '/admin/settings/metadata',
+  //       pro: false,
+  //       permissionModule: 'settings',
+  //     },
+  //     {
+  //       name: 'Litsenziyalar',
+  //       path: '/admin/settings/licenses',
+  //       pro: false,
+  //       permissionModule: 'settings',
+  //     },
+  //     {
+  //       name: 'API va xavfsizlik',
+  //       path: '/admin/settings/api',
+  //       pro: false,
+  //       permissionModule: 'settings',
+  //     },
+  //   ],
+  // },
 ]
 
 const othersItems: NavItem[] = [
@@ -276,13 +288,15 @@ const othersItems: NavItem[] = [
 ]
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar()
+  const handleSubmenuLinkClick = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      toggleMobileSidebar()
+    }
+  }
+
   const pathname = usePathname()
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useQuery<AuthUser>({
+  const { data: user, isLoading } = useQuery<AuthUser>({
     queryKey: ['getPermissions'],
     queryFn: () => authService.getProfile(),
     staleTime: 1000 * 60 * 5,
@@ -432,7 +446,7 @@ const AppSidebar: React.FC = () => {
                   {nav.subItems
                     .filter((sub) => hasPermission(sub.permissionModule))
                     .map((subItem) => (
-                      <li key={subItem.name}>
+                      <li onClick={handleSubmenuLinkClick} key={subItem.name}>
                         <Link
                           href={subItem.path}
                           className={`menu-dropdown-item ${
@@ -500,7 +514,7 @@ const AppSidebar: React.FC = () => {
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logo.svg"
                 alt="Logo"
                 width={150}
                 height={40}

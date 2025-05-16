@@ -186,6 +186,8 @@
   }
 }
 
+
+
 @utility menu-item {
   @apply text-theme-sm relative flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium;
 }
@@ -803,6 +805,65 @@ span.flatpickr-weekday,
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
+/* Ko'k theme */
+.theme-blue {
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --accent: #93C5FD;
+  --accent-foreground: #1E3A8A;
+  --radius: 0.5rem;
+  --button-bg: #3B82F6;
+  --button-text: #FFFFFF; /* Kontrast matn */
+  --button-radius: 0.5rem;
+}
+
+/* Yashil theme */
+.theme-green {
+  --primary: #22C55E;
+  --primary-foreground: #FFFFFF;
+  --accent: #86EFAC;
+  --accent-foreground: #166534;
+  --radius: 0.75rem;
+  --button-bg: #22C55E;
+  --button-text: #FFFFFF;
+  --button-radius: 0.75rem;
+}
+
+/* Qizil theme */
+.theme-red {
+  --primary: #EF4444;
+  --primary-foreground: #FFFFFF;
+  --accent: #FCA5A5;
+  --accent-foreground: #7F1D1D;
+  --radius: 0.25rem;
+  --button-bg: #EF4444;
+  --button-text: #FFFFFF;
+  --button-radius: 0.25rem;
+}
+
+/* Sariq theme */
+.theme-yellow {
+  --primary: #FACC15;
+  --primary-foreground: #000000;
+  --accent: #FDE68A;
+  --accent-foreground: #78350F;
+  --radius: 0.4rem;
+  --button-bg: #FACC15;
+  --button-text: #000000;
+  --button-radius: 0.4rem;
+}
+
+/* Monoxrom (oq-qora) theme */
+.theme-mono {
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --accent: #888888;
+  --accent-foreground: #ffffff;
+  --radius: 0rem;
+  --button-bg: #000000;
+  --button-text: #ffffff;
+  --button-radius: 0rem;
+}
 
 /*
   ---break---
@@ -853,6 +914,7 @@ span.flatpickr-weekday,
 /*
   ---break---
 */
+
 
 @layer base {
   * {

@@ -1,41 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Trash2 } from 'lucide-react'
-import { useAuditLogsQuery, useDeleteAuditLogMutation } from '@/hooks/use-audit-log'
+import { useAuditLogsQuery } from '@/hooks/use-audit-log'
 import AuditLogTable from '@/components/pages/audit-logs/audit-log-table'
 import PageBreadcrumb from '@/components/common/PageBreadCrumb'
+import CustomPagination from '@/components/pagination/CustomPagination'
+import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
+import AuditLogsFilter from '@/components/pages/audit-logs/Audit-logs-filter'
 
 export default function AdminAuditLogPage() {
-  const [openDialog, setOpenDialog] = useState(false)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [pageNumber, setPageNumber] = useState(1)
+  const pageSize = useResponsivePageSize({ reservedHeight: 300, rowHeight: 39 })
+  const [filter, setFilter] = useState({})
 
-  const { data } = useAuditLogsQuery(1, 100)
-  const deleteMutation = useDeleteAuditLogMutation(() => {
-    setOpenDialog(false)
-  })
+  const { data } = useAuditLogsQuery(pageNumber, pageSize, filter)
 
-  const onDelete = (id: string) => {
-    setDeleteId(id)
-    setOpenDialog(true)
-  }
-
-  console.log(data)
   return (
     <div className="space-y-6">
       <PageBreadcrumb pageTitle="Audit loglar" />
-      <AuditLogTable
-        logs={data?.data}
-        setDeleteId={setDeleteId}
-        setOpenDeleteModal={setOpenDialog}
+      <AuditLogsFilter onChange={setFilter} />
+      <AuditLogTable logs={data?.data} />
+      <CustomPagination
+        currentPage={pageNumber}
+        totalPages={data?.pageCount || 1}
+        onPageChange={setPageNumber}
+        position="right"
       />
-
-      {/*<AuditLogDeleteDialog*/}
-      {/*  open={openDialog}*/}
-      {/*  onClose={() => setOpenDialog(false)}*/}
-      {/*  onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}*/}
-      {/*/>*/}
     </div>
   )
 }

@@ -15,6 +15,12 @@ import { useQueryClient } from 'react-query'
 import { Resource } from '../../../../../../types/material/material.types'
 import PageBreadcrumb from '@/components/common/PageBreadCrumb'
 import { Input } from '@/components/ui/input'
+import { useCollectionsQuery } from '@/hooks/use-collections'
+import { useResourceTypesQuery } from '@/hooks/use-resources'
+import { useKeywordsQuery } from '@/hooks/use-keywords'
+import { ResourceFilterForm } from '@/components/pages/materials/materials-filter'
+import { useSubjectsQuery } from '@/hooks/use-subject'
+import { ResourceFilterDropdown } from '@/components/pages/materials/ Resource-filter-dropdown'
 
 export default function AdminResourcePage() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
@@ -23,6 +29,12 @@ export default function AdminResourcePage() {
   const [formKey, setFormKey] = useState(0)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [filters, setFilters] = useState<any>({})
+
+  const { data: subject } = useSubjectsQuery(1, 1000)
+  const { data: collections } = useCollectionsQuery(1, 1000)
+  const { data: resourceTypes } = useResourceTypesQuery(1, 1000)
+  const { data: keywords } = useKeywordsQuery(1, 1000)
   const queryClient = useQueryClient()
 
   const router = useRouter()
@@ -66,10 +78,19 @@ export default function AdminResourcePage() {
     }
   }
 
+  const handleTabChange = (val: string) => {
+    router.push(`?tab=${val}`)
+
+    if (val === 'resources') {
+      setSelectedResource(null)
+      setFormKey((prev) => prev + 1)
+    }
+  }
+
   return (
     <div className="w-full">
       <PageBreadcrumb pageTitle="Barcha resurslar" />
-      <Tabs value={tab} onValueChange={(val) => router.push(`?tab=${val}`)} className="w-full">
+      <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
         <div className="flex items-center justify-between">
           <TabsList className="bg-muted mb-4 grid grid-cols-2 rounded-md p-1">
             <TabsTrigger value="resources">Resurslar</TabsTrigger>
@@ -77,7 +98,17 @@ export default function AdminResourcePage() {
               {selectedResource ? 'Resursni tahrirlash' : "Resurs qo'shish"}
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
+            {collections && resourceTypes && keywords && subject?.data && (
+              <ResourceFilterDropdown
+                initialValues={filters}
+                onChange={(vals) => setFilters(vals)}
+                collections={collections.data}
+                resourceTypes={resourceTypes.data}
+                keywords={keywords.data}
+                subjects={subject.data}
+              />
+            )}
             <Input
               placeholder="Resurs qidirish..."
               value={search}
@@ -86,8 +117,10 @@ export default function AdminResourcePage() {
             />
           </div>
         </div>
+
         <TabsContent value="resources">
           <ResourceTable
+            filters={filters}
             debouncedSearch={debouncedSearch}
             setSearch={setSearch}
             search={search}
@@ -96,6 +129,7 @@ export default function AdminResourcePage() {
             onDelete={onDelete}
           />
         </TabsContent>
+
         <TabsContent value="add-resource">
           <div className="rounded-md border bg-white p-6 shadow-md dark:bg-[#181F2F]">
             <ResourceForm

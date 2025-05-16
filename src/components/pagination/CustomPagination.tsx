@@ -24,12 +24,16 @@ const CustomPagination = ({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
   const [jumpPage, setJumpPage] = useState<string>('')
 
-  const alignmentClass =
-    {
-      left: 'justify-start',
-      center: 'justify-center',
-      right: 'justify-end',
-    }[position] || 'justify-center'
+  // Mobilda har doim center, katta ekranlarda esa propsdan kelgan pozitsiya
+  const alignmentClass = `
+    sm:${
+      {
+        left: 'justify-start',
+        center: 'justify-center',
+        right: 'justify-end',
+      }[position] || 'justify-center'
+    } justify-center
+  `
 
   const handleJump = () => {
     const page = parseInt(jumpPage)
@@ -41,7 +45,7 @@ const CustomPagination = ({
 
   return (
     <Pagination className={`mt-6 flex flex-wrap items-center gap-4 ${alignmentClass}`}>
-      <PaginationContent className="flex flex-wrap items-center gap-x-2">
+      <PaginationContent className="flex items-center gap-x-2 overflow-x-auto">
         {/* << Birinchi sahifa */}
         <PaginationItem>
           <PaginationLink
@@ -71,8 +75,8 @@ const CustomPagination = ({
               href="#"
               isActive={page === currentPage}
               onClick={() => onPageChange(page)}
-              className={`rounded-full px-3 py-2 text-center ${
-                page === currentPage ? 'bg-primary' : ''
+              className={`rounded-full px-3 py-2 text-center text-white ${
+                page === currentPage ? 'bg-primary' : 'bg-gray-300'
               }`}
             >
               {page}
@@ -91,7 +95,7 @@ const CustomPagination = ({
           </PaginationLink>
         </PaginationItem>
 
-        {/* >> Oxirgi sahifaga */}
+        {/* >> Oxirgi sahifa */}
         <PaginationItem>
           <PaginationLink
             href="#"
@@ -102,8 +106,8 @@ const CustomPagination = ({
           </PaginationLink>
         </PaginationItem>
 
-        {/* Jump to page input */}
-        <PaginationItem className="ml-4 flex items-center gap-2">
+        {/* Jump to page input (hide on mobile) */}
+        <PaginationItem className="ml-4 hidden items-center gap-2 sm:flex">
           <Input
             type="number"
             placeholder="Sahifa..."

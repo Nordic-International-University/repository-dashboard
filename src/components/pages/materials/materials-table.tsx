@@ -23,6 +23,7 @@ interface ResourceTableProps {
   onDelete: (resource: Resource) => void
   setDebouncedSearch: (search: string) => void
   debouncedSearch: string
+  filters: any
   setSearch: (search: string) => void
   search: string
 }
@@ -31,6 +32,7 @@ import { useRouter } from 'next/navigation'
 export const ResourceTable = ({
   onEdit,
   onDelete,
+  filters,
   debouncedSearch,
   setDebouncedSearch,
   search,
@@ -47,9 +49,13 @@ export const ResourceTable = ({
     return () => clearTimeout(delay)
   }, [search])
 
-  const { data, isLoading, isError } = useResourcesQuery(pageNumber, pageSize, debouncedSearch)
+  const { data, isLoading, isError } = useResourcesQuery(
+    pageNumber,
+    pageSize,
+    debouncedSearch,
+    filters
+  )
 
-  console.log(data)
   return (
     <div className="space-y-4">
       <div className="max-w-full overflow-x-auto rounded-md border">

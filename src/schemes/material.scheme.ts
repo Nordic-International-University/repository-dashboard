@@ -12,4 +12,5 @@ export const resourceFormScheme = z.object({
   publisherId: z.string().optional(),
   documents: z.array(z.string()).optional().default([]),
   keywords: z.array(z.string()).optional().default([]),
+  authors: z.array(z.string()).optional().default([]),
 })

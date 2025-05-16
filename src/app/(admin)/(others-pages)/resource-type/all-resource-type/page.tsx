@@ -19,6 +19,8 @@ import ResourceTypeTable from '@/components/pages/resources/resources-table'
 import { ResourceTypeForm } from '@/components/pages/resources/resources-form'
 import { ResourceTypeDeleteDialog } from '@/components/pages/resources/resources-delete-dialog'
 import { useResponsivePageSize } from '@/hooks/use-responsive-pagesize'
+import { toast } from 'sonner'
+import { AxiosError } from 'axios'
 
 const Page = () => {
   const [pageNumber, setPageNumber] = useState(1)
@@ -35,14 +37,23 @@ const Page = () => {
   const deleteMutation = useDeleteResourceTypeMutation(refetch)
 
   const addResourceType = (values: ResourceTypeFormValues) => {
-    createMutation.mutate(values)
-    setOpenCreateModal(false)
+    createMutation.mutate(values, {
+      onSuccess: () => {
+        setOpenCreateModal(false)
+      },
+    })
   }
 
   const updateResourceType = (values: ResourceTypeFormValues) => {
     if (!editData) return
-    updateMutation.mutate({ id: editData.id, payload: values })
-    setOpenUpdateModal(false)
+    updateMutation.mutate(
+      { id: editData.id, payload: values },
+      {
+        onSuccess: () => {
+          setOpenUpdateModal(false)
+        },
+      }
+    )
   }
 
   const deleteResourceType = (id: string) => {
