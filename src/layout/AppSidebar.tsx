@@ -79,12 +79,12 @@ export const navItems: NavItem[] = [
         path: '/resource-type/all-resource-type',
         pro: false,
         permissionModule: 'resource-type',
-      },
+      },  
     ],
   },
   {
     icon: <FaBook size={18} />,
-    name: 'fanlar',
+    name: 'Fanlar',
     permissionModule: 'subjects',
     subItems: [
       {
@@ -139,7 +139,7 @@ export const navItems: NavItem[] = [
         permissionModule: 'resource',
       },
       {
-        name: `Tasdiqlanishi kerak bo'lgan materiallar`,
+        name: `O'zgarishlarni tasdiqlash`,
         path: '/materials/change-requests',
         pro: false,
         permissionModule: 'resource',
