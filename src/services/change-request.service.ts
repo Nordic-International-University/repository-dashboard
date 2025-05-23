@@ -50,7 +50,9 @@ export const changeRequestService = {
     }
   },
 
-  async deleteChangeRequest(id: string): Promise<{ message: string }> {
+  async deleteChangeRequest(id: string): Promise<{
+      data: Promise<any>;
+      message: string }> {
     try {
       const { data } = await axiosInstance.delete(`/change-request/${id}`)
       return data

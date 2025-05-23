@@ -16,8 +16,8 @@ export const permissionSchema = z.object({
   key: z
     .string()
     .regex(
-      /^[a-zA-Z]+:(read|create|delete|update)$/,
-      "Kalit faqat 'soz:read|create|delete|update' formatida bo'lishi kerak (masalan: document:delete)"
+      /^[a-zA-Z]+:(read|create|delete|update|change-request)$/,
+      "Kalit faqat 'soz:read|create|delete|update|change-request' formatida bo'lishi kerak (masalan: document:delete)"
     ),
   module: z.string().min(2, "Modul nomi kamida 2 ta belgidan iborat bo'lishi kerak"),
 })

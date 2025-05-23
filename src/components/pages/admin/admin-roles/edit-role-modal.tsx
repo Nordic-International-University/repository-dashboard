@@ -120,7 +120,7 @@ const EditRoleModal: FC<AddRoleModalProps> = ({
                             checked={watch('permissions').includes(perm.id)}
                             onCheckedChange={(checked) => handleCheckboxChange(perm.id, !!checked)}
                           />
-                          <Label htmlFor={perm.id}>{perm.name}</Label>
+                          <Label htmlFor={perm.id}>{perm.key}</Label>
                         </div>
                       ))}
                     </div>

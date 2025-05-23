@@ -1,9 +1,13 @@
+import {Resource} from "../material/material.types";
+
 export interface ChangeRequest {
+  data: Promise<any>;
   id: string
   resourceId: string
   requesterId: string
   approverId?: string
   comment: string
+  resource:Resource
   status: ChangeRequestStatus
   changes: Record<string, any>
   createdAt?: string
