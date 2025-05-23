@@ -11,8 +11,8 @@ enum StatusTranslation {
 }
 
 const ResourceChanges = ({
-                             resource,
-                             changes,
+         resource,
+changes,
                          }: {
     resource: any
     changes: any
@@ -29,8 +29,6 @@ const ResourceChanges = ({
         isStatus = false
     ) => {
         const isChanged = newValue !== undefined && oldValue !== newValue
-
-        // Handle statuses (translation using enum)
         if (isStatus) {
             const translateStatus = (status: string | undefined): string => {
                 if (!status) {
@@ -63,8 +61,6 @@ const ResourceChanges = ({
                 </div>
             )
         }
-
-        // Default rendering for non-status fields
         return (
             <div className="mb-2">
                 <p className="text-sm font-medium">
