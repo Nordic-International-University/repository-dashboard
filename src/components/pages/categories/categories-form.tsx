@@ -1,4 +1,4 @@
-// components/pages/categories/categories-form.tsx
+
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -44,7 +44,6 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
         },
     })
 
-    // Update form values if the `initialData` changes
     useEffect(() => {
         if (initialData) {
             form.reset({
@@ -55,11 +54,9 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
         }
     }, [initialData, form])
 
-    // Define the mutation for creating a new category
     const createMutation = useMutation({
         mutationFn: categoryService.createCategory,
         onSuccess: () => {
-            // Invalidate queries to refresh the list of categories
             queryClient.invalidateQueries({ queryKey: ['categories'] })
             toast.success('Yo‘nalish muvaffaqiyatli yaratildi')
             form.reset()
@@ -70,12 +67,10 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
         },
     })
 
-    // Define the mutation for updating an existing category
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: CategoryFormSchema }) =>
             categoryService.updateCategory(id, data as any),
         onSuccess: () => {
-            // Invalidate queries to refresh the list of categories
             queryClient.invalidateQueries({ queryKey: ['categories'] })
             toast.success('Yo‘nalish muvaffaqiyatli yangilandi')
             if (onSuccess) onSuccess()
@@ -91,7 +86,7 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
             if (isEditMode && initialData?.id) {
                 await updateMutation.mutateAsync({ id: initialData.id, data })
             } else {
-                  await createMutation.mutateAsync(data)
+                await createMutation.mutateAsync(data)
             }
         } catch (error) {
             console.error('Form submission error:', error)
@@ -131,8 +126,6 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
                         </FormItem>
                     )}
                 />
-
-                {/* Icon Selection Field */}
                 <FormField
                     control={form.control}
                     name="icon"
@@ -188,8 +181,6 @@ export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
                         </FormItem>
                     )}
                 />
-
-                {/* Submit Button */}
                 <Button
                     type="submit"
                     disabled={isLoading}

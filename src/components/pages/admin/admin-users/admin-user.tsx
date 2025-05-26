@@ -33,7 +33,7 @@ export default function AdminUsers() {
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<UsersList | null>(null)
 
-  const { data: roles } = useQuery<RoleListResponse | null>({
+  const { data: roles, refetch: RoleRefetch } = useQuery<RoleListResponse | null>({
     queryKey: ['roles'],
     queryFn: () => fetchRoles(),
   })
@@ -170,7 +170,12 @@ export default function AdminUsers() {
                   />
                 </div>
 
-                <Button className="" onClick={() => setIsAddUserModalOpen(true)}>
+                <Button
+                  onClick={() => {
+                    setIsAddUserModalOpen(true)
+                    RoleRefetch()
+                  }}
+                >
                   <UserPlus className="mr-2 h-4 w-4" />
                   Admin Foydalanuvchi Qo'shish
                 </Button>

@@ -155,7 +155,7 @@ export const ResourceFilterForm = ({
           name="fromDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Boshlanish sanasi</FormLabel>
+              <FormLabel>Dan</FormLabel>
               <FormControl>
                 <DatePicker
                   mode="single"
@@ -174,7 +174,7 @@ export const ResourceFilterForm = ({
           name="toDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tugash sanasi</FormLabel>
+              <FormLabel>Gacha</FormLabel>
               <FormControl>
                 <DatePicker
                   mode="single"

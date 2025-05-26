@@ -118,7 +118,12 @@ const FileUploadAntd: React.FC<FileUploadProps> = ({
 
   return (
     <div className={className}>
-      {label && <div className="font-medium">{label}</div>}
+      {label && (
+        <div className="mb-2 font-medium">
+          {label}
+          <span className="text-red-500">*</span>
+        </div>
+      )}
 
       <Dragger {...uploadProps} className="w-full">
         <p className="ant-upload-drag-icon">
@@ -151,7 +156,7 @@ const FileUploadAntd: React.FC<FileUploadProps> = ({
                 </Tooltip>,
               ]}
             >
-              <Typography.Text className="truncate">{file.name}</Typography.Text>
+              <Typography.Text className="truncate">{file.name.slice(0, 20)}</Typography.Text>
               <span className="ml-2 text-xs text-gray-500">
                 {file.size ? formatBytes(file.size) : ''}
               </span>

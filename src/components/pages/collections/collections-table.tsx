@@ -35,59 +35,62 @@ const CollectionsTable = ({
     <div className="w-full">
       {/* TABLE VIEW for desktop */}
       <div className="hidden overflow-hidden rounded-xl shadow-sm sm:block">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow className="bg-muted/40 hover:bg-muted/50 transition-colors">
-              <TableHead>Rasm</TableHead>
-              <TableHead>Sarlavha</TableHead>
-              <TableHead>Tavsif</TableHead>
-              <TableHead className="text-center">Material</TableHead>
-              <TableHead>Yaratilgan sana</TableHead>
-              <TableHead>Tahrirlangan sana</TableHead>
-              <TableHead className="text-center">Amallar</TableHead>
+              <TableHead className="w-20">Rasm</TableHead>
+              <TableHead className="w-1/4">Sarlavha</TableHead>
+              <TableHead className="w-1/3 truncate">Tavsif</TableHead>
+              <TableHead className="text-center w-20">Material</TableHead>
+              <TableHead className="w-32">Yaratilgan sana</TableHead>
+              <TableHead className="w-32">Tahrirlangan sana</TableHead>
+              <TableHead className="text-center w-20">Amallar</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {collections?.length ? (
-              collections.map((item) => (
-                <TableRow key={item.id} className="hover:bg-muted/20 transition-colors">
-                  <TableCell>
-                    <Image
-                      width={50}
-                      height={50}
-                      src={item?.coverImage?.url}
-                      alt={item.title}
-                      className="h-12 w-12 rounded-full border object-cover"
-                    />
-                  </TableCell>
-                  <TableCell>{item.title}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.description}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.resourceCount}</TableCell>
-                  <TableCell>{dayjs(item.createdAt).format('DD-MM-YYYY')}</TableCell>
-                  <TableCell>{dayjs(item.updatedAt).format('DD-MM-YYYY')}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEdit && onEdit(item, item.id)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteCollection(item.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                collections.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-muted/20 transition-colors">
+                      <TableCell>
+                        <Image
+                            width={50}
+                            height={50}
+                            src={item?.coverImage?.url}
+                            alt={item.title}
+                            className="h-12 w-12 rounded-full border object-cover"
+                        />
+                      </TableCell>
+                      <TableCell>{item.title}</TableCell>
+                      <TableCell className="text-muted-foreground truncate max-w-[200px]">
+                        {item.description}
+                      </TableCell>
+                      <TableCell className="flex items-center justify-center text-muted-foreground">
+                        {item.resourceCount}
+                      </TableCell>  <TableCell>{dayjs(item.createdAt).format('DD-MM-YYYY')}</TableCell>
+                      <TableCell>{dayjs(item.updatedAt).format('DD-MM-YYYY')}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onEdit && onEdit(item, item.id)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => deleteCollection(item.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                ))
+            ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-muted-foreground py-6 text-center">
+                    Bo'lim mavjud emas
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} className="text-muted-foreground py-6 text-center">
-                  Bo'lim mavjud emas
-                </TableCell>
-              </TableRow>
             )}
           </TableBody>
         </Table>

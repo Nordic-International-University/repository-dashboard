@@ -109,24 +109,6 @@ export default function ResourceDetailPage() {
     router.push('/materials/all-materials?tab=resources')
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-500'
-      case 'APPROVED':
-        return 'bg-green-500'
-      case 'REJECTED':
-        return 'bg-red-500'
-      case 'REVISION':
-        return 'bg-orange-500'
-      case 'DELETED':
-        return 'bg-gray-500'
-      case 'ARCHIVED':
-        return 'bg-blue-500'
-      default:
-        return 'bg-gray-500'
-    }
-  }
 
   const updateIsPublicMutation = useMutation({
     mutationFn: (isPublic: boolean) => resourceService.updateResource(id!, { isPublic }),

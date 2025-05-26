@@ -53,7 +53,17 @@ export const AuthorForm = ({ onSubmitFunction, initialData }: AuthorFormProps) =
             name={field as keyof AuthorFormValues}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.name === 'fullname' ? 'F.I.Sh.' : field.name}</FormLabel>
+                <FormLabel>
+                  {field.name === 'fullname'
+                    ? 'F.I.Sh.'
+                    : field.name === 'institution'
+                      ? 'Institut'
+                      : field.name === 'degree'
+                        ? 'Daraja'
+                        : field.name === 'department'
+                          ? 'Bo‘lim'
+                          : field.name}
+                </FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>

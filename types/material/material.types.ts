@@ -68,6 +68,7 @@ export interface ResourceFormValues {
   collectionId: string
   publisherId: string
   documents: string[]
+  isPublic:boolean
   authors: string[]
   keywords: string[]
 }
