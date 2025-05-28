@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ResourceForm } from '@/components/pages/materials/materials-form'
@@ -18,7 +18,6 @@ import { Input } from '@/components/ui/input'
 import { useCollectionsQuery } from '@/hooks/use-collections'
 import { useResourceTypesQuery } from '@/hooks/use-resources'
 import { useKeywordsQuery } from '@/hooks/use-keywords'
-import { ResourceFilterForm } from '@/components/pages/materials/materials-filter'
 import { useSubjectsQuery } from '@/hooks/use-subject'
 import { ResourceFilterDropdown } from '@/components/pages/materials/ Resource-filter-dropdown'
 
@@ -71,6 +70,7 @@ export default function AdminResourcePage() {
   }
 
   const onSubmit = (data: any) => {
+    console.log(data)
     if (selectedResource) {
       updateMutation.mutate({ id: selectedResource.id, payload: data })
     } else {

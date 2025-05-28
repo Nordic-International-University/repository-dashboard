@@ -57,7 +57,6 @@ export const ResourceTable = ({
     filters
   )
 
-  console.log(data)
   return (
     <div className="space-y-4">
       <div className="max-w-full overflow-x-auto rounded-md border">

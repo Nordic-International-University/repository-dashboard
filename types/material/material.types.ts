@@ -1,6 +1,10 @@
 export interface ResourceAuthor {
+  degree:string
+  department:string
   fullname: string
   username: string
+  id:string
+  institution:string
 }
 export interface Resource {
   id: string
@@ -54,6 +58,7 @@ export interface SingleResource {
   publisher: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVISION' | 'DELETED' | 'ARCHIVED'
   publishedAt: string
+  youtubeVideos: { url: string; title: string } | any
 }
 
 export interface ResourceFormValues {
