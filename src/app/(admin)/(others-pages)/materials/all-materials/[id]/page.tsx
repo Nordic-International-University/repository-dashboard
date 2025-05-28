@@ -4,19 +4,7 @@ import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  Calendar,
-  Download,
-  Edit,
-  Eye,
-  Globe,
-  Lock,
-  LockIcon,
-  Trash,
-  Unlock,
-  User,
-} from 'lucide-react'
+import { Calendar, Download, Eye, Globe, Lock, Trash, Unlock, User } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -109,7 +97,6 @@ export default function ResourceDetailPage() {
     router.push('/materials/all-materials?tab=resources')
   }
 
-
   const updateIsPublicMutation = useMutation({
     mutationFn: (isPublic: boolean) => resourceService.updateResource(id!, { isPublic }),
     onSuccess: () => {
@@ -189,10 +176,6 @@ export default function ResourceDetailPage() {
                     <div>
                       <h3 className="text-muted-foreground mb-1 text-sm font-medium">To'plam</h3>
                       <p>{resourceData.collection.title}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-muted-foreground mb-1 text-sm font-medium">Fan</h3>
-                      <p>{resourceData.subject.name}</p>
                     </div>
                     <div>
                       <h3 className="text-muted-foreground mb-1 text-sm font-medium">Ko‘rinish</h3>

@@ -79,22 +79,22 @@ export const navItems: NavItem[] = [
         path: '/resource-type/all-resource-type',
         pro: false,
         permissionModule: 'resource-type',
-      },  
-    ],
-  },
-  {
-    icon: <FaBook size={18} />,
-    name: 'Fanlar',
-    permissionModule: 'subjects',
-    subItems: [
-      {
-        name: 'Barcha fanlar',
-        path: '/subjects/all-subject',
-        pro: false,
-        permissionModule: 'subjects',
       },
     ],
   },
+  // {
+  //   icon: <FaBook size={18} />,
+  //   name: 'Fanlar',
+  //   permissionModule: 'subjects',
+  //   subItems: [
+  //     {
+  //       name: 'Barcha fanlar',
+  //       path: '/subjects/all-subject',
+  //       pro: false,
+  //       permissionModule: 'subjects',
+  //     },
+  //   ],
+  // },
   {
     icon: <VscSymbolKeyword size={18} />,
     name: `Kalit so'zlar`,

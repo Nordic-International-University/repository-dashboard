@@ -64,13 +64,14 @@ export interface ResourceFormValues {
   doi: string
   language: string
   license: string
-  subjectId: string
+  categoryId: string
   collectionId: string
   publisherId: string
   documents: string[]
-  isPublic:boolean
+  isPublic: boolean
   authors: string[]
   keywords: string[]
+  youtubeVideos: { url: string; title: string } | any
 }
 
 export interface PaginatedResourceResponse {

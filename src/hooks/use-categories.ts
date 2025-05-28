@@ -4,7 +4,7 @@ import { categoryService } from '@/services/category.service'
 import { toast } from 'sonner'
 import { Category } from '../../types/category/category.types'
 
-export const useCategoriesQuery = () =>
+export const useCategoriesQuery = (p0: number, p1: number) =>
   useQuery({
     queryKey: ['categories-all'],
     queryFn: () => categoryService.getCategories(1, 1000),

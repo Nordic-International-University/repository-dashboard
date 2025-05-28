@@ -30,14 +30,9 @@ import { useCreateKeywordMutation, useKeywordsQuery } from '@/hooks/use-keywords
 import FileUpload from '@/components/file.upload'
 import { AntdMultiSelect } from '@/components/input/custom-multi-select'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  useAuthorsQuery,
-  useCreateAuthorMutation,
-  useDeleteAuthorMutation,
-  useUpdateAuthorMutation,
-} from '@/hooks/use-authors'
+import { useAuthorsQuery, useCreateAuthorMutation } from '@/hooks/use-authors'
 import { resourceService } from '@/services/materials.service'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Card } from '@radix-ui/themes'
 import { Globe, Info, Lock } from 'lucide-react'
 import { AuthorForm } from '@/components/pages/author/author-form'
@@ -50,6 +45,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useCategoriesQuery } from '@/hooks/use-categories'
 
 interface Props {
   onSubmitFunction: (data: ResourceFormValues) => void
@@ -67,21 +64,23 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
       language: '',
       license: '',
       collectionId: '',
-      subjectId: '',
+      categoryId: '',
       resourceTypeId: '',
       authors: [],
       documents: [],
       keywords: [],
       isPublic: false,
+      youtubeVideos: [],
     },
   })
   const [openCreateModal, setOpenCreateModal] = useState(false)
   const { data: collections } = useCollectionsQuery(1, 1000)
-  const { data: subjects } = useSubjectsQuery(1, 1000)
+  const { data: category } = useCategoriesQuery(1, 1000)
   const { data: resourceTypes } = useResourceTypesQuery(1, 1000)
   const { data: keywords, refetch } = useKeywordsQuery(1, 1000)
   const { data: authors, refetch: authorRefetch } = useAuthorsQuery(1, 10000)
   const createAuthorMutation = useCreateAuthorMutation(refetch)
+
   const addAuthor = async (values: AuthorFormValues) => {
     await createAuthorMutation.mutateAsync(values)
     await authorRefetch()
@@ -89,7 +88,6 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
   }
   const createMutation = useCreateKeywordMutation()
   const [isPublic, setIsPublic] = useState(false)
-
   const [loadedData, setLoadedData] = useState<any>(null)
 
   useEffect(() => {
@@ -108,14 +106,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
   }, [initialData?.id])
   console.log(loadedData)
   useEffect(() => {
-    if (
-      !loadedData ||
-      !collections?.data ||
-      !subjects?.data ||
-      !resourceTypes?.data ||
-      !keywords?.data
-    )
-      return
+    if (!loadedData || !collections?.data || !resourceTypes?.data || !keywords?.data) return
 
     const collectionId = loadedData.collection?.id || ''
     const subjectId = loadedData.subject?.id || ''
@@ -145,7 +136,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
     setTimeout(() => {
       form.reset(normalized)
     }, 0)
-  }, [loadedData, collections, subjects, resourceTypes, keywords, form])
+  }, [loadedData, collections, resourceTypes, keywords, form])
 
   // @ts-ignore
   const onSubmit = form.handleSubmit(onSubmitFunction)
@@ -165,23 +156,139 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
         className="flex items-start gap-5 space-y-6"
       >
         <div className="w-full space-y-6">
-          <FileUpload
-            label={`Material faylini yuklash`}
-            variant="multiple"
-            accept="*"
-            initialFiles={
-              loadedData?.documents?.map((doc: any) => ({
-                id: doc.id,
-                name: doc.filename,
-                mimetype: doc.mimetype || 'application/octet-stream',
-                size: doc.size,
-                url: doc.url,
-              })) || []
-            }
-            onChange={(newDocumentIds) => {
-              form.setValue('documents', newDocumentIds)
-            }}
-          />
+          <Tabs defaultValue="account" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="account">Fayl yuklash</TabsTrigger>
+              <TabsTrigger value="youtubeVideos">Url yuklash</TabsTrigger>
+            </TabsList>
+            <TabsContent value="account">
+              <FileUpload
+                label={`Material faylini yuklash`}
+                variant="multiple"
+                accept="*"
+                initialFiles={
+                  loadedData?.documents?.map((doc: any) => ({
+                    id: doc.id,
+                    name: doc.filename,
+                    mimetype: doc.mimetype || 'application/octet-stream',
+                    size: doc.size,
+                    url: doc.url,
+                  })) || []
+                }
+                onChange={(newDocumentIds) => {
+                  form.setValue('documents', newDocumentIds)
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="youtubeVideos">
+              <Card>
+                <CardHeader>
+                  <CardTitle>YouTube Videolari Qo'shish</CardTitle>
+                  <CardDescription>
+                    Quyida YouTube video URL'larini sarlavhalar bilan qo'shing.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(() => {
+                    const [videoUrl, setVideoUrl] = useState('')
+                    const [videoTitle, setVideoTitle] = useState('')
+
+                    const youtubeVideos = form.watch('youtubeVideos') || []
+
+                    const handleAddOrUpdateVideo = (editingIndex: number | null) => {
+                      if (!videoUrl.trim() || !videoTitle.trim()) return
+                      const newVideoEntry = { url: videoUrl.trim(), title: videoTitle.trim() }
+                      // Add or update the video in the list
+                      const updatedVideos =
+                        editingIndex !== null
+                          ? youtubeVideos.map((entry, idx) =>
+                              idx === editingIndex ? newVideoEntry : entry
+                            )
+                          : [...youtubeVideos, newVideoEntry]
+
+                      form.setValue('youtubeVideos', updatedVideos)
+                      setVideoUrl('')
+                      setVideoTitle('')
+                    }
+
+                    const handleRemoveVideo = (index: number) => {
+                      form.setValue(
+                        'youtubeVideos',
+                        youtubeVideos.filter((_, i) => i !== index)
+                      )
+                    }
+
+                    return (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={videoUrl}
+                            placeholder="YouTube URL kiriting"
+                            onChange={(e) => setVideoUrl(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Input
+                            value={videoTitle}
+                            placeholder="Video sarlavhasi kiriting"
+                            onChange={(e) => setVideoTitle(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button onClick={() => handleAddOrUpdateVideo(null)}>Qo'shish</Button>
+                        </div>
+
+                        <div className="mt-4 space-y-3">
+                          {youtubeVideos.length > 0 ? (
+                            youtubeVideos.map((item, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between gap-4 rounded-md border p-2"
+                              >
+                                <div>
+                                  <p className="font-medium">{item.title}</p>
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 underline"
+                                  >
+                                    {item.url}
+                                  </a>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setVideoUrl(item.url)
+                                      setVideoTitle(item.title)
+                                    }}
+                                  >
+                                    Tahrirlash
+                                  </Button>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleRemoveVideo(index)}
+                                  >
+                                    O'chirish
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              Hozircha hech qaysi video qo'shilmagan.
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )
+                  })()}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
           <FormField
             name="title"
             render={({ field }) => (
@@ -444,9 +551,9 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
               labelKey: 'title',
             },
             {
-              name: 'subjectId',
-              label: 'Fan',
-              options: subjects?.data,
+              name: 'categoryId',
+              label: `Yo'nalishlar`,
+              options: category?.data,
               valueKey: 'id',
               labelKey: 'name',
             },
@@ -472,7 +579,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                         <SelectValue placeholder={`${label} tanlang`} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="h-52">
+                    <SelectContent>
                       {options?.map((opt: any) => (
                         <SelectItem key={opt[valueKey]} value={opt[valueKey]}>
                           {opt[labelKey]}
@@ -548,20 +655,32 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-muted-foreground text-sm">Faqat fayllar</div>
-              <div className="flex">
+              <div className="flex w-full overflow-hidden rounded-md border border-gray-300">
                 <div
-                  className={`flex-1 ${
-                    isPublic ? 'bg-green-600 text-white' : 'bg-muted text-muted-foreground'
-                  } cursor-pointer rounded-l-md py-2 text-center text-sm font-medium`}
-                  onClick={() => setIsPublic(true)}
+                  className={`flex-1 transition-all duration-300 ${
+                    isPublic
+                      ? 'flex-[1.5] bg-green-600 text-white'
+                      : 'bg-muted text-muted-foreground flex-1'
+                  } cursor-pointer py-2 text-center text-sm font-medium`}
+                  onClick={() => {
+                    form.setValue('isPublic', true)
+                    setIsPublic(true)
+                    console.log(form.getValues())
+                  }}
                 >
                   Ommaviy
                 </div>
                 <div
-                  className={`flex-1 ${
-                    !isPublic ? 'bg-red-600 text-white' : 'bg-muted text-muted-foreground'
-                  } cursor-pointer rounded-r-md py-2 text-center text-sm font-medium`}
-                  onClick={() => setIsPublic(false)}
+                  className={`flex-1 transition-all duration-300 ${
+                    isPublic
+                      ? 'bg-muted text-muted-foreground flex-1'
+                      : 'flex-[1.5] bg-red-600 text-white'
+                  } cursor-pointer py-2 text-center text-sm font-medium`}
+                  onClick={() => {
+                    form.setValue('isPublic', false)
+                    setIsPublic(false)
+                    console.log(form.getValues())
+                  }}
                 >
                   Cheklangan
                 </div>

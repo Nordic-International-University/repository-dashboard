@@ -28,6 +28,7 @@ interface ResourceTableProps {
   search: string
 }
 import { useRouter } from 'next/navigation'
+import dayjs from 'dayjs'
 
 export const ResourceTable = ({
   onEdit,
@@ -56,6 +57,7 @@ export const ResourceTable = ({
     filters
   )
 
+  console.log(data)
   return (
     <div className="space-y-4">
       <div className="max-w-full overflow-x-auto rounded-md border">
@@ -67,6 +69,7 @@ export const ResourceTable = ({
               <TableHead>Status</TableHead>
               <TableHead>Muallif</TableHead>
               <TableHead>Kim yukladi</TableHead>
+              <TableHead>Qo'shilgan vaqti</TableHead>
               <TableHead className="text-center">Amallar</TableHead>
             </TableRow>
           </TableHeader>
@@ -114,6 +117,9 @@ export const ResourceTable = ({
                   </TableCell>
                   <TableCell onClick={() => router.push(`/materials/all-materials/${item.id}`)}>
                     {item.publisher}
+                  </TableCell>
+                  <TableCell onClick={() => router.push(`/materials/all-materials/${item.id}`)}>
+                    {dayjs(item.publishedAt).format('DD-MM-YYYY:HH:MM')}
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex justify-center gap-2">

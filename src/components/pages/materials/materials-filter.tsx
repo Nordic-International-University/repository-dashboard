@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import { AntdMultiSelect } from '@/components/input/custom-multi-select'
 import { Collection } from '@/../types/colecctions/collections.types'
 import { Keyword } from '@/../types/keyword/keyword.types'
