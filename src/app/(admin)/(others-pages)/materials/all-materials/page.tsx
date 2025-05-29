@@ -30,7 +30,7 @@ export default function AdminResourcePage() {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [filters, setFilters] = useState<any>({})
 
-  const { data: subject } = useSubjectsQuery(1, 1000)
+
   const { data: collections } = useCollectionsQuery(1, 1000)
   const { data: resourceTypes } = useResourceTypesQuery(1, 1000)
   const { data: keywords } = useKeywordsQuery(1, 1000)
@@ -99,14 +99,14 @@ export default function AdminResourcePage() {
             </TabsTrigger>
           </TabsList>
           <div className="flex items-center justify-between gap-3">
-            {collections && resourceTypes && keywords && subject?.data && (
+            {collections && resourceTypes && keywords &&  (
               <ResourceFilterDropdown
                 initialValues={filters}
                 onChange={(vals) => setFilters(vals)}
                 collections={collections.data}
                 resourceTypes={resourceTypes.data}
                 keywords={keywords.data}
-                subjects={subject.data}
+                subjects={[]}
               />
             )}
             <Input
