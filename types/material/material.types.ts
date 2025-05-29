@@ -86,3 +86,21 @@ export interface PaginatedResourceResponse {
   pageSize: number
   pageCount: number
 }
+
+export enum ResourceStatusEnum {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  REVISION = 'REVISION',
+  ARCHIVED = 'ARCHIVED',
+  DELETED = 'DELETED'
+}
+
+const RESOURCE_STATUS_LABELS = {
+  [ResourceStatusEnum.PENDING]: 'Kutilmoqda',
+  [ResourceStatusEnum.APPROVED]: 'Tasdiqlangan',
+  [ResourceStatusEnum.REJECTED]: 'Rad etilgan',
+  [ResourceStatusEnum.REVISION]: 'Qayta ko\'rib chiqish',
+  [ResourceStatusEnum.ARCHIVED]: 'Arxivlangan',
+  [ResourceStatusEnum.DELETED]: 'O\'chirilgan'
+} as const

@@ -20,7 +20,6 @@ import {
   GraduationCap,
   Users,
   FileText,
-  Play
 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -51,17 +50,9 @@ import { toast } from 'sonner'
 import { getStatusBadge } from '@/lib/getStatusIcons'
 import { Switch } from '@/components/ui/switch'
 import PageBreadcrumb from '@/components/common/PageBreadCrumb'
-
+import {ResourceStatusEnum} from '../../../../../../../types/material/material.types'
 type ResourceStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVISION' | 'DELETED' | 'ARCHIVED'
 
-const statusTranslations = {
-  PENDING: 'Kutilmoqda',
-  APPROVED: 'Tasdiqlangan',
-  REJECTED: 'Rad etilgan',
-  REVISION: "Qayta ko'rib chiqish",
-  DELETED: "O'chirilgan",
-  ARCHIVED: 'Arxivlangan',
-}
 
 export default function ResourceDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -70,6 +61,17 @@ export default function ResourceDetailPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isPublic, setIsPublic] = useState(false)
   const [status, setStatus] = useState<ResourceStatus>('PENDING')
+
+  const RESOURCE_STATUS_LABELS = {
+    [ResourceStatusEnum.PENDING]: 'Kutilmoqda',
+    [ResourceStatusEnum.APPROVED]: 'Tasdiqlangan',
+    [ResourceStatusEnum.REJECTED]: 'Rad etilgan',
+    [ResourceStatusEnum.REVISION]: 'Tahrir talab etiladi',
+    [ResourceStatusEnum.ARCHIVED]: 'Arxivlangan',
+    [ResourceStatusEnum.DELETED]: 'O\'chirilgan'
+  } as const
+
+
 
   const {
     data: resourceData,
@@ -81,7 +83,6 @@ export default function ResourceDetailPage() {
     enabled: !!id,
   })
 
-  console.log(resourceData)
   const updateStatusMutation = useMutation({
     //@ts-ignore
     mutationFn: (status: ResourceStatus) => resourceService.updateResource(id!, { status: status }),
@@ -98,7 +99,7 @@ export default function ResourceDetailPage() {
     mutationFn: () => resourceService.deleteResource(id!),
     onSuccess: () => {
       toast.success("Resurs muvaffaqiyatli o'chirildi")
-      router.push('/admin/resources')
+      router.push('/materials/all-materials?tab=resources')
     },
     onError: () => {
       toast.error("Resursni o'chirishda xatolik yuz berdi")
@@ -217,7 +218,7 @@ export default function ResourceDetailPage() {
                       <div className="space-y-2">
                         <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                           <Building className="h-4 w-4" />
-                          To'plam
+                          Bo'lim
                         </h3>
                         <Badge variant="secondary" className="text-sm">
                           {resourceData.collection.title}
@@ -401,14 +402,14 @@ export default function ResourceDetailPage() {
                       <SelectValue placeholder="Holatni tanlang" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="PENDING">Kutilmoqda</SelectItem>
-                      <SelectItem value="APPROVED">Tasdiqlangan</SelectItem>
-                      <SelectItem value="REJECTED">Rad etilgan</SelectItem>
-                      <SelectItem value="REVISION">Qayta ko'rib chiqish</SelectItem>
-                      <SelectItem value="ARCHIVED">Arxivlangan</SelectItem>
-                      <SelectItem value="DELETED">O'chirilgan</SelectItem>
+                      {Object.values(ResourceStatusEnum).map((statusValue) => (
+                          <SelectItem key={statusValue} value={statusValue}>
+                            {RESOURCE_STATUS_LABELS[statusValue]}
+                          </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+
                 </div>
 
                 <Separator />

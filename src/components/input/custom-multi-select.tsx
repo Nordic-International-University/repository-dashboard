@@ -45,7 +45,6 @@ export const AntdMultiSelect = ({
         onChange(v)
       }
     } else {
-      // val bu: hozirgi Selectdagi barcha qiymatlar (eskilar + yangi input)
       const valArr = val as string[]
       const newOptions = [...internalOptions]
       const updatedValues: string[] = []

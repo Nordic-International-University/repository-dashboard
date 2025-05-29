@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import { useCollectionsQuery } from '@/hooks/use-collections'
 import {
@@ -33,10 +33,11 @@ import { useAuthorsQuery, useCreateAuthorMutation } from '@/hooks/use-authors'
 import { resourceService } from '@/services/materials.service'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Card } from '@radix-ui/themes'
-import { Globe, Info, Lock } from 'lucide-react'
+import { Globe, Info, Lock, AlertCircle } from 'lucide-react'
 import { AuthorForm } from '@/components/pages/author/author-form'
 import { DialogModal } from '@/components/modal/custom.modal'
 import { AuthorFormValues } from '../../../../types/author/author.types'
+import {UniversalDropdown,UniversalSingleDropdown} from '../../input/custom.dropdown'
 import {
     Dialog,
     DialogClose,
@@ -76,7 +77,12 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
     const [videoUrl, setVideoUrl] = useState('')
     const [videoTitle, setVideoTitle] = useState('')
     const [openCreateModal, setOpenCreateModal] = useState(false)
-    const [urlError, setUrlError] = useState('') // Qo'shimcha xatolik uchun
+    const [urlError, setUrlError] = useState('')
+    const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
+
+    // Ref'lar input'larni focus qilish uchun
+    const urlInputRef = useRef<HTMLInputElement>(null)
+    const titleInputRef = useRef<HTMLInputElement>(null)
 
     const { data: collections } = useCollectionsQuery(1, 1000)
     const { data: category } = useCategoriesQuery(1, 1000)
@@ -115,6 +121,15 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
 
     const handleUrlChange = (value: string) => {
         setVideoUrl(value)
+        // Agar foydalanuvchi yozishni boshlasa, ogohlantirish ko'rsatish
+        if (value.trim() && !showUnsavedWarning) {
+            setShowUnsavedWarning(true)
+        }
+        // Agar bo'sh bo'lsa, ogohlantirish yashirish
+        if (!value.trim() && !videoTitle.trim()) {
+            setShowUnsavedWarning(false)
+        }
+
         if (urlError && value.trim()) {
             const formattedUrl = formatUrl(value.trim())
             if (validateUrl(formattedUrl)) {
@@ -123,6 +138,17 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
         }
     }
 
+    const handleTitleChange = (value: string) => {
+        setVideoTitle(value)
+        // Agar foydalanuvchi yozishni boshlasa, ogohlantirish ko'rsatish
+        if (value.trim() && !showUnsavedWarning) {
+            setShowUnsavedWarning(true)
+        }
+        // Agar bo'sh bo'lsa, ogohlantirish yashirish
+        if (!value.trim() && !videoUrl.trim()) {
+            setShowUnsavedWarning(false)
+        }
+    }
 
     const handleAddOrUpdateVideo = (editingIndex: number | null) => {
         if (!videoUrl.trim() || !videoTitle.trim()) {
@@ -137,7 +163,8 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
             return
         }
 
-        setUrlError('') // Xatolikni tozalash
+        setUrlError('')
+        setShowUnsavedWarning(false) // Muvaffaqiyatli qo'shilganda ogohlantirish yashirish
 
         const newVideoEntry = { url: formattedUrl, title: videoTitle.trim() }
         const currentVideos = form.getValues('youtubeVideos') || []
@@ -154,14 +181,35 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
         setVideoTitle('')
     }
 
-
-
     const handleRemoveVideo = (index: number) => {
         const currentVideos = form.getValues('youtubeVideos') || []
         form.setValue(
             'youtubeVideos',
             currentVideos.filter((_:any, i:number) => i !== index)
         )
+    }
+
+    // Unsaved ma'lumotlarni tekshirish va focus qilish
+    const checkUnsavedUrlData = () => {
+        const hasUnsavedData = videoUrl.trim() || videoTitle.trim()
+
+        if (hasUnsavedData) {
+            // Input'larni qizil rangga o'tkazish va focus qilish
+            setUrlError('Qo\'shilmagan ma\'lumotlar mavjud! Avval "Qo\'shish" tugmasini bosing yoki ma\'lumotlarni o\'chiring.')
+
+            // Birinchi bo'sh input'ga focus qilish
+            if (!videoUrl.trim() && urlInputRef.current) {
+                urlInputRef.current.focus()
+            } else if (!videoTitle.trim() && titleInputRef.current) {
+                titleInputRef.current.focus()
+            } else if (urlInputRef.current) {
+                urlInputRef.current.focus()
+            }
+
+            return true
+        }
+
+        return false
     }
 
     useEffect(() => {
@@ -179,12 +227,10 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
         fetchInitialData()
     }, [initialData?.id])
 
-
     useEffect(() => {
         if (!loadedData || !collections?.data || !resourceTypes?.data || !keywords?.data) return
 
         const collectionId = loadedData.collection?.id || ''
-        // Bu yerda o'zgarish - categoryId ishlatish kerak
         const categoryId = loadedData.category?.id || loadedData.subject?.id || ''
         const resourceTypeId = loadedData.resourceType?.id || ''
         const keywordIds =
@@ -202,7 +248,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
             license: loadedData.license || 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
             language: loadedData.language || '',
             collectionId,
-            categoryId, // Bu yerda ham o'zgarish
+            categoryId,
             resourceTypeId,
             keywords: keywordIds,
             documents: documentIds,
@@ -212,19 +258,29 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
 
         setTimeout(() => {
             form.reset(normalized)
-            // isPublic state'ni ham yangilash
             setIsPublic(loadedData.isPublic || false)
         }, 0)
     }, [loadedData, collections, resourceTypes, keywords, form])
 
-    // @ts-ignore
-    const onSubmit = form.handleSubmit(onSubmitFunction)
+    // Submit funksiyasini o'zgartirish
+    const handleSubmit = () => {
+        // Avval unsaved URL ma'lumotlarini tekshirish
+        if (checkUnsavedUrlData()) {
+            return // Agar unsaved ma'lumotlar bo'lsa, submit'ni to'xtatish
+        }
+
+        // Agar hammasi yaxshi bo'lsa, submit qilish
+        //@ts-ignore
+        form.handleSubmit(onSubmitFunction)()
+    }
 
     const onCancel = () => {
         form.reset()
         setIsPublic(false)
         setVideoUrl('')
         setVideoTitle('')
+        setShowUnsavedWarning(false)
+        setUrlError('')
     }
 
     const youtubeVideos = form.watch('youtubeVideos') || []
@@ -234,7 +290,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
             <form
                 onSubmit={(e) => {
                     e.preventDefault()
-                    onSubmit()
+                    handleSubmit()
                 }}
                 className="flex items-start max-md:flex-col-reverse gap-5 space-y-6"
             >
@@ -275,29 +331,46 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1">
                                             <Input
+                                                ref={urlInputRef}
                                                 value={videoUrl}
                                                 placeholder="https://example.com yoki www.example.com"
                                                 onChange={(e) => handleUrlChange(e.target.value)}
-                                                className={`flex-1 ${urlError ? 'border-red-500' : ''}`}
+                                                className={`flex-1 ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                             />
                                         </div>
                                         <Input
+                                            ref={titleInputRef}
                                             value={videoTitle}
                                             placeholder="Havola sarlavhasini kiriting"
-                                            onChange={(e) => setVideoTitle(e.target.value)}
-                                            className="flex-1"
+                                            onChange={(e) => handleTitleChange(e.target.value)}
+                                            className={`flex-1 ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                                         />
 
                                         <Button
-                                            type="button" // Bu muhim!
+                                            type="button"
                                             onClick={() => handleAddOrUpdateVideo(null)}
                                         >
                                             Qo'shish
                                         </Button>
                                     </div>
-                                    {urlError && (
-                                        <p className="mt-1 text-sm text-red-500">{urlError}</p>
+
+                                    {/* Saqlash ogohlantirishi */}
+                                    {showUnsavedWarning && !urlError && (
+                                        <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3">
+                                            <AlertCircle className="h-4 w-4 text-amber-600" />
+                                            <p className="text-sm text-amber-700">
+                                                Ma'lumotlar kiritildi. "Qo'shish" tugmasini bosing yoki formani to'ldiring.
+                                            </p>
+                                        </div>
                                     )}
+
+                                    {urlError && (
+                                        <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3">
+                                            <AlertCircle className="h-4 w-4 text-red-600" />
+                                            <p className="text-sm text-red-600">{urlError}</p>
+                                        </div>
+                                    )}
+
                                     <div className="mt-4 space-y-3">
                                         {youtubeVideos.length > 0 ? (
                                             youtubeVideos.map((item:any, index:number) => (
@@ -318,12 +391,14 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <Button
-                                                            type="button" // Bu ham muhim!
+                                                            type="button"
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => {
                                                                 setVideoUrl(item.url)
                                                                 setVideoTitle(item.title)
+                                                                setShowUnsavedWarning(false)
+                                                                setUrlError('')
                                                             }}
                                                         >
                                                             Tahrirlash
@@ -363,8 +438,6 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                             </FormItem>
                         )}
                     />
-
-                    {/* Qolgan kodlarning davomi... */}
                     {[
                         { name: 'description', label: 'Tavsif', type: 'textarea', required: true },
                         { name: 'doi', label: 'DOI', type: 'input', required: false },
@@ -403,138 +476,82 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                             )}
                         />
                     ))}
+
                     <FormField
                         name="authors"
-                        render={({ field }) => {
-                            const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-                            const [searchTerm, setSearchTerm] = useState('')
-                            const dropdownRef = React.useRef<HTMLDivElement>(null) // Ref qo'shish
-
-                            const filteredAuthors = authors?.data?.filter((author) =>
-                                author.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
-
-                            // Click outside uchun useEffect qo'shish
-                            useEffect(() => {
-                                const handleClickOutside = (event: MouseEvent) => {
-                                    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                                        setIsDropdownOpen(false)
-                                    }
-                                }
-
-                                if (isDropdownOpen) {
-                                    document.addEventListener('mousedown', handleClickOutside)
-                                }
-
-                                return () => {
-                                    document.removeEventListener('mousedown', handleClickOutside)
-                                }
-                            }, [isDropdownOpen])
-
-                            return (
-                                <FormItem>
-                                    <FormLabel>Muallifni tanlang</FormLabel>
-                                    <FormControl>
-                                        <div className="relative" ref={dropdownRef}> {/* Ref qo'shish */}
-                                            <div
-                                                className="flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2"
-                                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                            >
-                            <span className="flex-1 text-sm text-gray-600">
-                                {field.value.length > 0
-                                    ? `Tanlangan: ${field.value.length}`
-                                    : 'Mualliflarni tanlang...'}
-                            </span>
-                                                <span className="text-gray-500">{isDropdownOpen ? '▲' : '▼'}</span>
-                                            </div>
-                                            {isDropdownOpen && (
-                                                <div className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white shadow-lg">
-                                                    <div className="p-2">
-                                                        <Input
-                                                            type="text"
-                                                            placeholder="Qidirish..."
-                                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                                            value={searchTerm}
-                                                            className="w-full"
-                                                            onClick={(e) => e.stopPropagation()} // Input click'ini to'xtatish
-                                                        />
-                                                    </div>
-                                                    <div className="px-2 py-1">
-                                                        {filteredAuthors?.length ? (
-                                                            filteredAuthors.map((author) => (
-                                                                <div
-                                                                    key={author.id}
-                                                                    className="flex items-center gap-2 py-1"
-                                                                    onClick={(e) => e.stopPropagation()} // Click'ni to'xtatish
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        id={`author-${author.id}`}
-                                                                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                                        checked={field.value.includes(author.id)}
-                                                                        onChange={(e) => {
-                                                                            e.stopPropagation() // Bu ham muhim
-                                                                            if (e.target.checked) {
-                                                                                field.onChange([...field.value, author.id])
-                                                                            } else {
-                                                                                field.onChange(
-                                                                                    field.value.filter((id: string) => id !== author.id)
-                                                                                )
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <label
-                                                                        htmlFor={`author-${author.id}`}
-                                                                        className="cursor-pointer text-sm"
-                                                                        onClick={(e) => e.stopPropagation()} // Label click'ini ham to'xtatish
-                                                                    >
-                                                                        {author.fullname}
-                                                                    </label>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <p className="py-2 text-center text-sm text-gray-500">
-                                                                Muallif topilmadi
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <div className="border-t p-2">
-                                                        <Dialog open={openCreateModal} onOpenChange={setOpenCreateModal}>
-                                                            <DialogTrigger asChild>
-                                                                <Button
-                                                                    type="button"
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="w-full"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation() // Dialog ochishda dropdown yopilmasligi uchun
-                                                                    }}
-                                                                >
-                                                                    + Qo'shish
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent>
-                                                                <DialogTitle>Yangi muallif qo'shish</DialogTitle>
-                                                                <AuthorForm onSubmitFunction={addAuthor} />
-                                                                <DialogClose asChild>
-                                                                    <Button variant="ghost" className="absolute top-2 right-2">
-                                                                        Yopish
-                                                                    </Button>
-                                                                </DialogClose>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Muallifni tanlang</FormLabel>
+                                <FormControl>
+                                    <UniversalDropdown
+                                        options={authors?.data || []}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        labelKey="fullname"
+                                        valueKey="id"
+                                        placeholder="Mualliflarni tanlang..."
+                                        searchPlaceholder="Mualliflarni qidiring..."
+                                        noDataText="Muallif topilmadi"
+                                        selectedText="Tanlangan"
+                                        showAddButton={true}
+                                        addButtonText="+ Yangi muallif"
+                                        addModalTitle="Yangi muallif qo'shish"
+                                        AddFormComponent={AuthorForm}
+                                        onAdd={addAuthor}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
-
-                    {/* Qolgan select field'lar va boshqa elementlar o'zgarishsiz */}
+                    <FormField
+                        name="collectionId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Bo'lim <span className="text-red-500">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                    <UniversalSingleDropdown
+                                        options={collections?.data || []}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        labelKey="title"
+                                        valueKey="id"
+                                        placeholder="Bo'limni tanlang..."
+                                        searchPlaceholder="Bo'limlarni qidiring..."
+                                        noDataText="Bo'lim topilmadi"
+                                        showAddButton={false}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        name="categoryId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Yo'nalishlar <span className="text-red-500">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                    <UniversalSingleDropdown
+                                        options={category?.data || []}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        labelKey="name"
+                                        valueKey="id"
+                                        placeholder="Yo'nalishni tanlang..."
+                                        searchPlaceholder="Yo'nalishlarni qidiring..."
+                                        noDataText="Yo'nalish topilmadi"
+                                        showAddButton={false}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     {[
                         {
                             name: 'language',
@@ -542,25 +559,10 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                             options: [
                                 { language: "O'zbekcha", value: 'uzbek' },
                                 { language: 'Inglizcha', value: 'english' },
-                                // ... boshqa tillar
                             ],
                             valueKey: 'value',
                             labelKey: 'language',
-                        },
-                        {
-                            name: 'collectionId',
-                            label: `Bo'lim`,
-                            options: collections?.data,
-                            valueKey: 'id',
-                            labelKey: 'title',
-                        },
-                        {
-                            name: 'categoryId',
-                            label: `Yo'nalishlar`,
-                            options: category?.data,
-                            valueKey: 'id',
-                            labelKey: 'name',
-                        },
+                       },
                         {
                             name: 'resourceTypeId',
                             label: 'Resurs turi',

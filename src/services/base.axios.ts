@@ -1,100 +1,44 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import Router from 'next/router'
-
-let isRefreshing = false
-let failedQueue: any[] = []
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error)
-    } else {
-      prom.resolve(token)
-    }
-  })
-  failedQueue = []
-}
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
-  headers: {
-    'ngrok-skip-browser-warning': '69420',
-    Authorization: `Bearer ${Cookies.get('access_token')}`,
-  },
+    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+    headers: {
+        'ngrok-skip-browser-warning': '69420',
+    },
 })
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = Cookies.get('access_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
+    const token = Cookies.get('access_token')
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
 })
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config
+if (typeof window !== 'undefined') {
+    axiosInstance.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            console.log('Response error:', error.response?.status, error.message)
 
-    const refreshToken = Cookies.get('refresh_token')
-    const is401 = error.response?.status === 401
+            const is401 = error.response?.status === 401
 
-    if (originalRequest.url.includes('/auth/refresh-token') && is401) {
-      Cookies.remove('access_token')
-      Cookies.remove('refresh_token')
-      Router.push('/signin')
-      return Promise.reject(error)
-    }
-    if (is401 && !originalRequest._retry && refreshToken) {
-      if (isRefreshing) {
-        return new Promise(function (resolve, reject) {
-          failedQueue.push({ resolve, reject })
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = 'Bearer ' + token
-            return axiosInstance(originalRequest)
-          })
-          .catch((err) => {
-            return Promise.reject(err)
-          })
-      }
+            if (is401) {
+                console.log('401 detected, redirecting to signin')
 
-      originalRequest._retry = true
-      isRefreshing = true
+                Cookies.remove('access_token')
+                Cookies.remove('refresh_token')
 
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/refresh-token`,
-          {
-            refreshToken,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+                // Immediate redirect
+                window.location.replace('/signin')
 
-        const newToken = response.data?.accessToken
-        Cookies.set('access_token', newToken)
+                return Promise.reject(error)
+            }
 
-        processQueue(null, newToken)
-        originalRequest.headers.Authorization = 'Bearer ' + newToken
-        return axiosInstance(originalRequest)
-      } catch (err) {
-        processQueue(err, null)
-        Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-        Router.push('/signin')
-        return Promise.reject(err)
-      } finally {
-        isRefreshing = false
-      }
-    }
-
-    return Promise.reject(error)
-  }
-)
+            return Promise.reject(error)
+        }
+    )
+}
 
 export default axiosInstance
