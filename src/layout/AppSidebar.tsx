@@ -71,7 +71,7 @@ export const navItems: NavItem[] = [
   },
   {
     icon: <GrResources size={20} />,
-    name: 'Material Resurs turi',
+    name: 'Resurs turi',
     permissionModule: 'resource-type',
     subItems: [
       {
@@ -110,11 +110,11 @@ export const navItems: NavItem[] = [
   },
   {
     icon: <VscSymbolKeyword size={18} />,
-    name: `Mulliflar`,
+    name: `Mualliflar`,
     permissionModule: 'author',
     subItems: [
       {
-        name: `Barcha Mulliflar`,
+        name: `Barcha Mualliflar`,
         path: '/authors/all-author',
         pro: false,
         permissionModule: 'author',

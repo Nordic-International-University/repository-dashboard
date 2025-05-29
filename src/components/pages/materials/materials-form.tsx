@@ -101,7 +101,7 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
     const [loadedData, setLoadedData] = useState<any>(null)
 
     const validateUrl = (url: string): boolean => {
-        const urlPattern = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/
+        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
         const completeUrlPattern = /^https?:\/\//
 
         if (!completeUrlPattern.test(url) && urlPattern.test(url)) {
@@ -189,7 +189,6 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
         )
     }
 
-    // Unsaved ma'lumotlarni tekshirish va focus qilish
     const checkUnsavedUrlData = () => {
         const hasUnsavedData = videoUrl.trim() || videoTitle.trim()
 
@@ -353,8 +352,6 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                                             Qo'shish
                                         </Button>
                                     </div>
-
-                                    {/* Saqlash ogohlantirishi */}
                                     {showUnsavedWarning && !urlError && (
                                         <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3">
                                             <AlertCircle className="h-4 w-4 text-amber-600" />
@@ -479,31 +476,134 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
 
                     <FormField
                         name="authors"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Muallifni tanlang</FormLabel>
-                                <FormControl>
-                                    <UniversalDropdown
-                                        options={authors?.data || []}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        labelKey="fullname"
-                                        valueKey="id"
-                                        placeholder="Mualliflarni tanlang..."
-                                        searchPlaceholder="Mualliflarni qidiring..."
-                                        noDataText="Muallif topilmadi"
-                                        selectedText="Tanlangan"
-                                        showAddButton={true}
-                                        addButtonText="+ Yangi muallif"
-                                        addModalTitle="Yangi muallif qo'shish"
-                                        AddFormComponent={AuthorForm}
-                                        onAdd={addAuthor}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        render={({ field }) => {
+                            const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+                            const [searchTerm, setSearchTerm] = useState('')
+                            const dropdownRef = React.useRef<HTMLDivElement>(null)
+
+                            const filteredAuthors = authors?.data?.filter((author) =>
+                                author.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+
+                            useEffect(() => {
+                                const handleClickOutside = (event: MouseEvent) => {
+                                    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                                        setIsDropdownOpen(false)
+                                    }
+                                }
+
+                                if (isDropdownOpen) {
+                                    document.addEventListener('mousedown', handleClickOutside)
+                                }
+
+                                return () => {
+                                    document.removeEventListener('mousedown', handleClickOutside)
+                                }
+                            }, [isDropdownOpen])
+
+                            return (
+                                <FormItem>
+                                    <FormLabel>Muallifni tanlang</FormLabel>
+                                    <FormControl>
+                                        <div className="relative" ref={dropdownRef}>
+                                            <div
+                                                className="flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2"
+                                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                            >
+                                                <span className="flex-1 text-sm text-gray-600">
+                                                    {field.value.length > 0
+                                                        ? `Tanlangan: ${field.value.length}`
+                                                        : 'Mualliflarni tanlang...'}
+                                                </span>
+                                                <span className="text-gray-500">{isDropdownOpen ? '▲' : '▼'}</span>
+                                            </div>
+                                            {isDropdownOpen && (
+                                                <div className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white shadow-lg">
+                                                    <div className="p-2">
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Qidirish..."
+                                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                                            value={searchTerm}
+                                                            className="w-full"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                    </div>
+                                                    <div className="px-2 py-1">
+                                                        {filteredAuthors?.length ? (
+                                                            filteredAuthors.map((author) => (
+                                                                <div
+                                                                    key={author.id}
+                                                                    className="flex items-center gap-2 py-1"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        id={`author-${author.id}`}
+                                                                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                                        checked={field.value.includes(author.id)}
+                                                                        onChange={(e) => {
+                                                                            e.stopPropagation()
+                                                                            if (e.target.checked) {
+                                                                                field.onChange([...field.value, author.id])
+                                                                            } else {
+                                                                                field.onChange(
+                                                                                    field.value.filter((id: string) => id !== author.id)
+                                                                                )
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <label
+                                                                        htmlFor={`author-${author.id}`}
+                                                                        className="cursor-pointer text-sm"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        {author.fullname}
+                                                                    </label>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <p className="py-2 text-center text-sm text-gray-500">
+                                                                Muallif topilmadi
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="border-t p-2">
+                                                        <Dialog open={openCreateModal} onOpenChange={setOpenCreateModal}>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    type="button"
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="w-full"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                    }}
+                                                                >
+                                                                    + Qo'shish
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent>
+                                                                <DialogTitle>Yangi muallif qo'shish</DialogTitle>
+                                                                <AuthorForm onSubmitFunction={addAuthor} />
+                                                                <DialogClose asChild>
+                                                                    <Button variant="ghost" className="absolute top-2 right-2">
+                                                                        Yopish
+                                                                    </Button>
+                                                                </DialogClose>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )
+                        }}
                     />
+
                     <FormField
                         name="collectionId"
                         render={({ field }) => (
@@ -552,17 +652,79 @@ export const ResourceForm = ({ onSubmitFunction, initialData }: Props) => {
                             </FormItem>
                         )}
                     />
+                    <FormField
+                        name="language"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Tilni tanlang <span className="text-red-500">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                    <UniversalSingleDropdown
+                                        options={[
+                                            { language: "O'zbekcha", value: 'uzbek' },
+                                            { language: 'Inglizcha', value: 'english' },
+                                            { language: 'Ruscha', value: 'russian' },
+                                            { language: 'Arabcha', value: 'arabic' },
+                                            { language: 'Turkcha', value: 'turkish' },
+                                            { language: 'Yaponcha', value: 'japanese' },
+                                            { language: 'Koreyscha', value: 'korean' },
+                                            { language: 'Xitoycha', value: 'chinese' },
+                                            { language: 'Portugalcha', value: 'portuguese' },
+                                            { language: 'Hindcha', value: 'hindi' },
+                                            { language: 'Urducha', value: 'urdu' },
+                                            { language: 'Bengalcha', value: 'bengali' },
+                                            { language: 'Malaycha', value: 'malay' },
+                                            { language: 'Indonezcha', value: 'indonesian' },
+                                            { language: 'Uyg‘urcha', value: 'uyghur' },
+                                            { language: 'Shvedcha', value: 'swedish' },
+                                            { language: 'Norvegcha', value: 'norwegian' },
+                                            { language: 'Fincha', value: 'finnish' },
+                                            { language: 'Polshalikcha', value: 'polish' },
+                                            { language: 'Chexcha', value: 'czech' },
+                                            { language: 'Vengarcha', value: 'hungarian' },
+                                            { language: 'Grekcha', value: 'greek' },
+                                            { language: 'Gollandcha', value: 'dutch' },
+                                            { language: 'Danishcha', value: 'danish' },
+                                            { language: 'Romancha', value: 'romanian' },
+                                            { language: 'Slovakcha', value: 'slovak' },
+                                            { language: 'Serbcha', value: 'serbian' },
+                                            { language: 'Xorvatcha', value: 'croatian' },
+                                            { language: 'Boshqirdcha', value: 'bashkir' },
+                                            { language: 'Qozog‘cha', value: 'kazakh' },
+                                            { language: 'Qirg‘izcha', value: 'kyrgyz' },
+                                            { language: 'Tojikcha', value: 'tajik' },
+                                            { language: 'Turkmanchacha', value: 'turkmen' },
+                                            { language: 'Tatarcha', value: 'tatar' },
+                                            { language: 'Ukraincha', value: 'ukrainian' },
+                                            { language: 'Belaruscha', value: 'belarusian' },
+                                            { language: 'Latishcha', value: 'latvian' },
+                                            { language: 'Litvacha', value: 'lithuanian' },
+                                            { language: 'Estoncha', value: 'estonian' },
+                                            { language: 'Gruzincha', value: 'georgian' },
+                                            { language: 'Armancha', value: 'armenian' },
+                                            { language: 'Mo‘g‘ulcha', value: 'mongolian' },
+                                            { language: 'Nepalcha', value: 'nepali' },
+                                            { language: 'Sinhala', value: 'sinhala' },
+                                            { language: 'Tailandcha', value: 'thai' },
+                                            { language: 'Vietnamcha', value: 'vietnamese' }
+                                        ]}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        labelKey="language"
+                                        valueKey="value"
+                                        placeholder="Tilni tanlang..."
+                                        searchPlaceholder="Tillarni qidiring..."
+                                        noDataText="Til topilmadi"
+                                        showAddButton={false}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     {[
-                        {
-                            name: 'language',
-                            label: 'Til',
-                            options: [
-                                { language: "O'zbekcha", value: 'uzbek' },
-                                { language: 'Inglizcha', value: 'english' },
-                            ],
-                            valueKey: 'value',
-                            labelKey: 'language',
-                       },
                         {
                             name: 'resourceTypeId',
                             label: 'Resurs turi',

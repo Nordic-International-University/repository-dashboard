@@ -137,9 +137,7 @@ export function UniversalDropdown<T = any>({
                             />
                         </div>
                     )}
-
-                    {/* Options list */}
-                    <div className="max-h-48 overflow-auto px-2 py-1">
+                    <div className="max-h-48 overflow-auto px-2 pb-16 pt-1">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option: any) => (
                                 <div
@@ -175,7 +173,7 @@ export function UniversalDropdown<T = any>({
 
                     {/* Add button */}
                     {showAddButton && (
-                        <div className="border-t p-2">
+                        <div className="border-t absolute w-full bg-white bottom-0 p-2">
                             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button
@@ -193,11 +191,6 @@ export function UniversalDropdown<T = any>({
                                     {AddFormComponent && (
                                         <AddFormComponent onSubmitFunction={handleAddSubmit} />
                                     )}
-                                    <DialogClose asChild>
-                                        <Button variant="ghost" className="absolute top-2 right-2">
-                                            Yopish
-                                        </Button>
-                                    </DialogClose>
                                 </DialogContent>
                             </Dialog>
                         </div>
@@ -342,17 +335,18 @@ export function UniversalSingleDropdown<T = any>({
 
                     {showAddButton && (
                         <div className="border-t p-2">
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {addButtonText}
+                            </Button>
                             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                                 <DialogTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        className="w-full"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        {addButtonText}
-                                    </Button>
+
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogTitle>{addModalTitle}</DialogTitle>

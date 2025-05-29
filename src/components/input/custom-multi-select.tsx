@@ -72,7 +72,10 @@ export const AntdMultiSelect = ({
       value={value}
       placeholder={placeholder}
       onChange={handleChange}
-      options={internalOptions}
+      filterOption={(input, option) =>
+          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+      }
+      options={internalOptions.sort((a,b) => a.label.localeCompare(b.label))}
       loading={loading}
       style={{ width: '100%' }}
       notFoundContent={loading ? <Spin size="small" /> : null}
