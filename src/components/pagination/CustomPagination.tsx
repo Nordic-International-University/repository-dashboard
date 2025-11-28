@@ -1,6 +1,7 @@
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
 } from '@/components/ui/pagination'
@@ -15,16 +16,47 @@ interface PaginationProps {
   position?: 'left' | 'center' | 'right'
 }
 
+const getVisiblePages = (currentPage: number, totalPages: number): (number | 'ellipsis')[] => {
+  const delta = 1 // Joriy sahifa atrofida ko'rsatiladigan sahifalar soni
+  const range: (number | 'ellipsis')[] = []
+
+  // Har doim 1-sahifani ko'rsat
+  range.push(1)
+
+  // Agar joriy sahifa 1 dan uzoqroq bo'lsa
+  if (currentPage > delta + 2) {
+    range.push('ellipsis')
+  }
+
+  // Joriy sahifa atrofidagi sahifalar
+  for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+    if (!range.includes(i)) {
+      range.push(i)
+    }
+  }
+
+  // Agar oxirgi sahifadan uzoqroq bo'lsa
+  if (currentPage < totalPages - delta - 1) {
+    range.push('ellipsis')
+  }
+
+  // Har doim oxirgi sahifani ko'rsat (agar 1 dan katta bo'lsa)
+  if (totalPages > 1 && !range.includes(totalPages)) {
+    range.push(totalPages)
+  }
+
+  return range
+}
+
 const CustomPagination = ({
   currentPage,
   totalPages,
   onPageChange,
   position = 'center',
 }: PaginationProps) => {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+  const visiblePages = getVisiblePages(currentPage, totalPages)
   const [jumpPage, setJumpPage] = useState<string>('')
 
-  // Mobilda har doim center, katta ekranlarda esa propsdan kelgan pozitsiya
   const alignmentClass = `
     sm:${
       {
@@ -69,20 +101,26 @@ const CustomPagination = ({
         </PaginationItem>
 
         {/* Sahifalar */}
-        {pages.map((page) => (
-          <PaginationItem key={page}>
-            <PaginationLink
-              href="#"
-              isActive={page === currentPage}
-              onClick={() => onPageChange(page)}
-              className={`rounded-full px-3 py-2 text-center text-white ${
-                page === currentPage ? 'bg-primary' : 'bg-gray-300'
-              }`}
-            >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
+        {visiblePages.map((page, index) =>
+          page === 'ellipsis' ? (
+            <PaginationItem key={`ellipsis-${index}`}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={page}>
+              <PaginationLink
+                href="#"
+                isActive={page === currentPage}
+                onClick={() => onPageChange(page)}
+                className={`rounded-full px-3 py-2 text-center text-white ${
+                  page === currentPage ? 'bg-primary' : 'bg-gray-300'
+                }`}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        )}
 
         {/* Keyingi */}
         <PaginationItem>

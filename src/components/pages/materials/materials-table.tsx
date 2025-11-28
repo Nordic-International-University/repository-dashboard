@@ -95,7 +95,7 @@ export const ResourceTable = ({
               data.data.map((item) => (
                 <TableRow key={item.id} className="hover:bg-muted/40 cursor-pointer transition">
                   <TableCell onClick={() => router.push(`/materials/all-materials/${item.id}`)}>
-                    {item.title}
+                    {item.title.slice(0,30)}...
                   </TableCell>
                   <TableCell onClick={() => router.push(`/materials/all-materials/${item.id}`)}>
                     {item.language}
